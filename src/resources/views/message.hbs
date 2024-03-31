@@ -1,0 +1,9 @@
+<div id="messages">
+  {{#each messages}}
+    <ul class="{{@key}}">
+      {{#each this}}
+        <li>{{this}}</li>
+      {{/each}}
+    </ul>
+  {{/each}}
+</div>

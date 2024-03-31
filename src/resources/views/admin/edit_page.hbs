@@ -1,0 +1,27 @@
+<h2 class="page-title">Edit a page</h2>
+<a href="/adminpage/pages" class="btn btn-primary">Back to all pages</a>
+<br><br>
+
+    {{!-- dùng _method tạo ở index.js để overdrive method post thành put để sửa course --}}
+{{!-- <form method="POST" action="/adminpage/edit-page/{{ id }}" enctype="application/x-www-form-urlencoded"> --}}
+    <!-- Thêm trường ẩn để gửi phương thức PUT -->
+    {{!-- <input type="hidden" name="_method" value="PUT"> --}}
+<form method="POST" action="/adminpage/edit-page/{{id}}?_method=PUT">
+
+    <div class="form-group">
+        <label for="">Title</label>
+        <input type="text" class="form-control" name="title" value="{{ title }}" placeholder="Title">
+    </div>
+    
+    <div class="form-group">
+        <label for="">Slug</label>
+        <input type="text" class="form-control" name="slug" value="{{ slug }}" placeholder="Slug">
+    </div>
+    
+    <div class="form-group">
+        <label for="">Content</label>
+        <textarea name="content" class="form-control" id="ta" cols="30" rows="10" placeholder="Content">{{ content }}</textarea>
+    </div>
+    
+    <button type="submit" class="btn btn-primary">Submit</button>
+</form>
