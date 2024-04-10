@@ -1,0 +1,142 @@
+{{#if cart}}
+    <h1 class="page-title">My Cart</h1>
+    <br><br>
+
+    <table class="table table-striped alignmiddle">
+        
+        <tr>
+            <th>Image</th>
+            <th>Title</th>
+            <th>Price</th>
+            <th>Quantity</th>
+            <th></th>
+            <th>Subtotal</th>
+        </tr>
+
+        {{!-- Lặp qua từng sản phẩm trong giỏ hàng --}}
+        {{#each cart}}
+            <tr>
+                <td><img class="cpi" src="{{ image }}" alt=""></td>
+                <td>{{ title }}</td>
+                <td class="product-price" data-price="{{ price }}">${{ price }}</td>
+                <td class="cart-table">
+                    <span class="qty-display">{{ qty }}</span>
+                    <button class="cart-action" data-action="add" data-title="{{ title }}">+</button>&nbsp;
+                    <button class="cart-action" data-action="remove" data-title="{{ title }}">-</button>&nbsp;
+                    <button class="cart-action" data-action="clear" data-title="{{ title }}">Clear</button>&nbsp;
+                </td>
+                <td class="product-subtotal">${{ calculateSubtotal price qty }}</td>
+            </tr>
+        {{/each}}
+
+
+        <tr>
+            <td colspan="6" align="right" id="cart-total"><b>Total: </b> ${{ calculateTotal cart }}</td>
+        </tr>
+
+        <tr>
+            <td colspan="5" align="right">
+                <a class="clearcart btn btn-danger" href="/cart/clear">Clear cart</a>
+            </td>
+            <td colspan="5" align="right">
+                <a class="btn btn-primary buynow" href="#">Buy now</a>
+            </td>
+        </tr>
+        
+    </table>
+
+{{else}}
+    <h3 class="text-center">Your cart is empty.</h3>
+{{/if}}
+
+<script>
+
+// Hàm tính tổng giá trị của giỏ hàng
+function calculateTotal(cart) {
+    let total = 0;
+    cart.forEach(item => {
+        total += parseFloat(item.price) * item.qty;
+    });
+    return total.toFixed(2);
+}
+
+
+// Hàm cập nhật giao diện người dùng
+// Hàm cập nhật giao diện người dùng
+function updateUI(title, action, cart) {
+    const product = document.querySelectorAll('.cart-table');
+    const productElement = document.querySelector(`[data-title="${title}"]`);
+    const qtyElement = productElement ? productElement.parentElement.querySelector('.qty-display') : null;
+
+    if (qtyElement) {
+        let qty = parseInt(qtyElement.textContent);
+
+        // Cập nhật số lượng sản phẩm dựa vào hành động
+        if (action === 'add') {
+            qty++;
+        } else if (action === 'remove') {
+            qty--;
+        } else {
+            qty = 0;
+        }
+
+        // Cập nhật số lượng sản phẩm trên giao diện người dùng
+        qtyElement.textContent = qty;
+
+        // Xóa sản phẩm khỏi giỏ hàng nếu số lượng là 0
+        if (qty === 0) {
+            productElement.parentElement.remove();
+        }
+
+        const priceElement = product.querySelector('.product-price');
+            const price = parseFloat(priceElement.getAttribute('data-price'));
+            const subtotalElement = product.querySelector('.product-subtotal');
+            const subtotal = calculateSubtotal(price, qty);
+            subtotalElement.textContent = `$${subtotal}`;
+
+        // Cập nhật tổng giá trị của giỏ hàng
+        const cartTotalElement = document.querySelector('#cart-total');
+        if (cartTotalElement) {
+            cartTotalElement.textContent = `$${calculateTotal(cart)}`;
+        } else {
+            console.error('Cart total element not found');
+        }
+
+    } else {
+        console.error('Quantity element not found');
+    }
+}
+
+
+document.addEventListener('DOMContentLoaded', function () {
+   
+    // Nhúng dữ liệu giỏ hàng vào biến JavaScript
+    const cartData = {{{json cart}}};
+
+
+    const cartActions = document.querySelectorAll('.cart-action');
+    cartActions.forEach(function (action) {
+        action.addEventListener('click', function (event) {
+            event.preventDefault();
+            const dataAction = this.getAttribute('data-action');
+            const dataTitle = this.getAttribute('data-title');
+
+            fetch(`/cart/update/${dataTitle}?action=${dataAction}`, {
+                method: 'PUT'
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                // Xử lý phản hồi thành công
+                updateUI(dataTitle, dataAction, );
+            })
+            .catch(error => {
+                console.error('There was a problem with your fetch operation:', error);
+                // Xử lý lỗi
+            });
+        });
+    });
+});
+
+</script>

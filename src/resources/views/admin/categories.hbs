@@ -1,0 +1,65 @@
+<h2 class="page-title">Categories</h2>
+<a href="/admincategory/add-category" class="btn btn-primary">Add a new category</a>
+<br><br>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Category</th>
+            <th>Edit</th>
+            <th>Delete</th>
+        </tr>
+    </thead>
+    <tbody>
+        {{#each categories}}
+        <tr>
+            <td>{{title}}</td>
+            <td><a href="/admincategory/edit-category/{{this._id}}">Edit</a></td>
+            <td><a class="btn" data-bs-toggle="modal" data-bs-id="{{this._id}}" href="" data-bs-target="#delete-category-modal">Delete</a></td>
+        </tr>
+        {{/each}}
+    </tbody>
+</table>
+
+{{!-- Confirm delete modal--}}
+<div class="modal fade" id="delete-category-modal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h1 class="modal-title fs-5" id="exampleModalLabel">Confirm Delete ?</h1>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <p>Delete...</p>
+      </div>
+      <div class="modal-footer">
+        <button id="btn-delete-category" type="button" class="btn btn-danger">Delete</button>
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+{{!-- Hidden delete form --}}
+<form name="delete-form" method="POST"></form>
+
+<script>
+    const deleteModal = document.getElementById('delete-category-modal')
+    var categoryId;
+    var deleteForm = document.forms['delete-form']; // lấy form ẩn xóa trong DOM
+    var btnDelete = document.getElementById('btn-delete-category'); // lấy nút xóa trong modal confirm xóa
+
+    if (deleteModal) {
+        deleteModal.addEventListener('show.bs.modal', event => { // lắng nghe event click vào nút xóa trong dang sách course
+            const button = event.relatedTarget;
+            categoryId = button.getAttribute('data-bs-id'); // lấy id của course muốn xóa khi click vào nút xóa của course đó
+            //console.log(courseId);
+        })
+    }
+
+    btnDelete.onclick = function() { // lắng nghe event click nút xóa
+        // tạo action mới cho deleteForm như sau: /courses/_id?_method=DELETE:
+        deleteForm.action = '/admincategory' + '/delete-category/' + categoryId + '?_method=DELETE'; // overdrive method POST của hidden form bằng method DELETE
+        deleteForm.submit(); // thực thi form ẩn để xóa course đang chọn
+    }
+</script>

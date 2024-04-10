@@ -4,6 +4,10 @@ const router = express.Router(); // khởi tạo router và gọi Router của e
 
 const homeController = require('../app/controllers/HomeController'); 
 
-router.get('/', homeController.index); // truyền vào path và function handler của news
+router.get('/', homeController.index); 
+// router.get('/about', homeController.about); 
+// router.get('/services', homeController.services); 
+// router.get('/blog', homeController.blog); 
+// router.get('/contact', homeController.contact); 
 
 module.exports = router; // export router ra ngoài để route parent là index.js có thể sử dụng

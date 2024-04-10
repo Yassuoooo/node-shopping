@@ -187,7 +187,7 @@ router.put('/edit-page/:id', [
 });
 
 /*
- * GET delete page
+ * DELETE remove page
  */
 router.delete('/delete-page/:id', (req, res) => {
     Page.findOneAndDelete({ _id: req.params.id })

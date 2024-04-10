@@ -1,0 +1,82 @@
+<h2 class="page-title">Products</h2>
+<a href="/adminproduct/add-product" class="btn btn-primary">Add a new product</a>
+<br><br>
+
+{{#if count}}
+<table class="table table-striped alignmiddle">
+    <thead>
+        <tr class="home">
+            <th>Product</th>
+            <th>Price</th>
+            <th>Category</th>
+            <th>Product Image</th>
+            <th>Edit</th>
+            <th>Delete</th>
+        </tr>
+    </thead>
+    <tbody>
+        {{#each products}}
+        <tr>
+            <td>{{this.title}}</td>
+            <td>${{formatPrice this.price}}</td>
+            <td>{{this.category}}</td>
+            <td>
+                {{#if this.image}}
+                    <img id="img" src="/img/{{this.image}}" alt="Product Image">
+                {{else}}
+                    <img id="noimage" src="/img/noimage.png" alt="No Image">
+                {{/if}}
+
+            </td>
+            <td><a href="/adminproduct/edit-product/{{this._id}}">Edit</a></td>
+            <td><a class="btn" data-bs-toggle="modal" data-bs-id="{{this._id}}" href="" data-bs-target="#delete-product-modal">Delete</a></td>
+        </tr>
+        {{/each}}
+    </tbody>
+</table>
+{{else}}
+<h3 class="text-center">There are no products.</h3>
+{{/if}}
+
+<!-- Confirm delete modal -->
+<div class="modal fade" id="delete-product-modal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h1 class="modal-title fs-5" id="exampleModalLabel">Confirm Delete ?</h1>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <p>Delete...</p>
+      </div>
+      <div class="modal-footer">
+        <button id="btn-delete-product" type="button" class="btn btn-danger">Delete</button>
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Hidden delete form -->
+<form name="delete-form" method="POST"></form>
+
+<script>
+    const deleteModal = document.getElementById('delete-product-modal')
+    var productId;
+    var deleteForm = document.forms['delete-form']; // lấy form ẩn xóa trong DOM
+    var btnDelete = document.getElementById('btn-delete-product'); // lấy nút xóa trong modal confirm xóa
+
+    if (deleteModal) {
+        deleteModal.addEventListener('show.bs.modal', event => { // lắng nghe event click vào nút xóa trong dang sách course
+            const button = event.relatedTarget;
+            productId = button.getAttribute('data-bs-id'); // lấy id của course muốn xóa khi click vào nút xóa của course đó
+            //console.log(courseId);
+        })
+    }
+
+    btnDelete.onclick = function() { // lắng nghe event click nút xóa
+        // tạo action mới cho deleteForm như sau: /courses/_id?_method=DELETE:
+        deleteForm.action = '/adminproduct' + '/delete-product/' + productId + '?_method=DELETE'; // overdrive method POST của hidden form bằng method DELETE
+        deleteForm.submit(); // thực thi form ẩn để xóa course đang chọn
+    }
+</script>

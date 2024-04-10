@@ -1,0 +1,64 @@
+<div class="row">
+    <h1 class="page-header">{{ p.title }}</h1>
+    
+    <div class="col-xs-12 col-md-5">
+        <img class="spi" src="/product_images/{{ p._id }}/{{ p.image }}" alt="{{ p.title }}">
+        <br>
+    </div>
+    
+    <div class="col-xs-12 col-md-7">
+        <p>{{ p.desc }}</p>
+        <p>${{ formatCurrency p.price }}</p>
+        
+        {{!-- <button onclick="addToCart('{{ p.slug }}')">Add to Cart</button> --}}
+        <form action="/cart/add/{{ p.slug }}" method="get">
+            <button class="btn-add-product" type="submit">Add to cart</button>
+        </form> 
+    </div>
+</div>
+
+<script>
+function addToCart(slug) {
+    fetch(`/cart/add/${slug}`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            console.log(data.message);
+            updateCartCount(); // Cập nhật số lượng sản phẩm trong giỏ hàng trên navbar
+        } else {
+            console.error(data.message);
+        }
+    })
+    .catch(error => {
+        console.error('Error adding product to cart:', error);
+    });
+}
+
+function updateCartCount() {
+    fetch('/cart/count', {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            const cartCountElement = document.getElementById('cart-count');
+            if (cartCountElement) {
+                cartCountElement.textContent = data.count;
+            }
+        } else {
+            console.error(data.message);
+        }
+    })
+    .catch(error => {
+        console.error('Error updating cart count:', error);
+    });
+}
+</script>

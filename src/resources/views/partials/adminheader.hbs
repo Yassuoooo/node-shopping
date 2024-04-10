@@ -21,6 +21,11 @@
             <li><a class="dropdown-item" href="#">Log out</a></li>
           </ul>
         </li>
+        {{#each pages}}
+          <li class="nav-item">
+            <a class="nav-link" href="/{{slug}}">{{title}}</a>
+          </li>
+        {{/each}}
       </ul>
     </div>
   </div>

@@ -21,8 +21,80 @@
             <li><a class="dropdown-item" href="#">Log out</a></li>
           </ul>
         </li>
+
+        {{#each pages}}
+          <li class="nav-item">
+            <a class="nav-link" href="/{{slug}}">{{title}}</a>
+          </li>
+        {{/each}}
+
+        <!-- Thêm danh sách các danh mục dưới dạng dropdown -->
+        {{!-- <li class="nav-item">
+          <select class="form-select" aria-label="Category dropdown">
+            <option selected>Choose category</option>
+            {{#each categories}}
+              <option href="/products/{{this.slug}}">{{this.title}}</option>
+            {{/each}}
+          </select>
+        </li> --}}
+
+        <li class="nav-item">
+        <form action="/products/filter" method="GET">
+            <select class="form-select" name="category" aria-label="Category dropdown">
+                <option selected disabled>Choose category</option>
+                {{#each categories}}
+                    <option value="{{this.slug}}">{{this.title}}</option>
+                {{/each}}
+            </select>
+            <button type="submit" class="btn btn-primary">Filter</button>
+        </form>
+        </li>
+
+        <li>
+            <a href="/cart/checkout" id="cart-link">My Cart (
+                {{#if cart}}
+                    <span id="cart-count">{{cart.length}}</span>
+                {{else}}
+                    <span id="cart-count">0</span>
+                {{/if}}
+            )</a>
+        </li>
+
       </ul>
     </div>
   </div>
 </nav>
-{{messages 'my_message_template' locals}}
+{{!-- {{messages 'my_message_template' locals}} --}}
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        var addToCartButtons = document.querySelectorAll('.btn-add-product');
+
+        addToCartButtons.forEach(function(button) {
+            button.addEventListener('click', function(event) {
+                var productSlug = button.getAttribute('data-product-slug');
+
+                // Gửi yêu cầu Ajax để thêm sản phẩm vào giỏ hàng
+                var xhr = new XMLHttpRequest();
+                xhr.open('POST', '/add/' + productSlug, true);
+                xhr.setRequestHeader('Content-Type', 'application/json');
+                xhr.onload = function() {
+                    if (xhr.status === 200) {
+                        // Cập nhật số lượng sản phẩm trong thanh navbar
+                        updateCartCount();
+                    } else {
+                        console.log('Request failed. Status: ' + xhr.status);
+                    }
+                };
+                xhr.send();
+            });
+        });
+
+        // Hàm cập nhật số lượng sản phẩm trong thanh navbar
+        function updateCartCount() {
+            var cartCountElement = document.getElementById('#cart-count');
+            var currentCount = parseInt(cartCountElement.innerText);
+            cartCountElement.innerText = currentCount + 1; // Tăng số lượng sản phẩm lên 1 đơn vị
+        }
+    });
+</script>
