@@ -16,18 +16,18 @@ var Category = require('../app/models/category');
  * GET category index
  */
 
-// return data:
-// router.get('/', (req, res) => {
-//     Category.find({}).exec()
-//         .then(categories => {
-//             res.json(categories);
-//         })
-//         .catch(err => {
-//             // If an error occurs, send a 500 Internal Server Error response
-//             console.error(err);
-//             res.status(500).json({ error: 'Internal Server Error' });
-//         });
-// });
+// postman::
+router.get('/p-category', (req, res) => {
+    Category.find({}).exec()
+        .then(categories => {
+            res.status(200).json(categories);
+        })
+        .catch(err => {
+            // If an error occurs, send a 500 Internal Server Error response
+            console.error(err);
+            res.status(500).json({ error: 'Internal Server Error' });
+        });
+});
 
 function authenticateToken(req, res, next) {
     const token = req.cookies.token;
@@ -48,7 +48,9 @@ function authenticateToken(req, res, next) {
     next();
 }
 
-// return rendered page:
+
+
+// client:
 router.get('/', authenticateToken, checkLogin, checkAdminCategory, (req, res) => { // Áp dụng middleware checkLogin và checkAdminCategory
     // Find all categories
     Category.find()
@@ -89,6 +91,44 @@ router.get('/add-category', authenticateToken, checkLogin, checkAdminCategory, (
  * POST add category
  */
 
+// postman:
+router.post('/p-addcategory', [
+    body('title').notEmpty().withMessage('Title must have a value.'),
+], (req, res) => {
+
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.render('admin/add_category', {
+            errors: errors.array(),
+            title: req.body.title,         
+            layout: 'adminmain'
+        });
+    }
+
+    var title = req.body.title;
+    var slug = title.replace(/\s+/g, '-').toLowerCase();
+
+    Category.findOne({ title: title })
+        .then(data => {
+            if (data) {
+                return res.status(400).json('Category already exists');
+            } else {
+                return Category.create({
+                    title: title,
+                    slug: slug,
+                })
+                    .then(() => {
+                        return res.status(201).json('created');
+                    });
+            }
+        })
+        .catch(err => {
+            return res.status(500).json('Failed Creating category: ' + err);
+        });
+});
+
+
+// client:
 router.post('/add-category', [
     body('title').notEmpty().withMessage('Title must have a value.'),
 ], checkLogin, checkAdminCategory, (req, res) => {
@@ -150,6 +190,48 @@ router.get('/edit-category/:id', authenticateToken, checkLogin, checkAdminCatego
 /*
  * PUT edit category
  */
+
+// postman:
+router.put('/p-editcategory/:id', [
+    body('title').notEmpty().withMessage('Title must have a value.')
+], (req, res) => {
+
+    const id = req.params.id;
+    const title = req.body.title;
+    const slug = title.replace(/\s+/g, '-').toLowerCase();
+    const errors = validationResult(req);
+
+    if (!errors.isEmpty()) {
+        return res.render('admin/edit_category', {
+            errors: errors.array(),
+            title: req.body.title,
+            slug: title.replace(/\s+/g, '-').toLowerCase(),
+            layout: 'adminmain'
+        });
+    } else {
+        Category.findById(id)
+        .then(category => {
+            if (!category) {
+                return res.status(404).send('Category not found');
+            } else {
+                category.title = title;
+                category.slug = slug;
+                return category.save();
+            }
+        })
+        .then(() => {
+            //res.redirect('/admincategory');
+            res.status(200).json('updated');
+        })
+        .catch(err => {
+            console.error(err);
+            res.status(500).send('Internal Server Error');
+        });
+    }
+
+});
+
+// client:
 router.put('/edit-category/:id', [
     body('title').notEmpty().withMessage('Title must have a value.')
 ], checkLogin, checkAdminCategory, (req, res) => {
@@ -192,6 +274,27 @@ router.put('/edit-category/:id', [
 /*
  * DELETE remove category
  */
+
+// postman:
+router.delete('/p-deletecategory/:id', (req, res) => {
+    Category.findOneAndDelete({ _id: req.params.id })
+        .then(deletedCategory => {
+            if (!deletedCategory) {
+                return res.status(404).send('Category not found');
+            }
+            return Category.find({}).exec();
+        })
+        .then(categories => {
+            req.app.locals.categories = categories;
+            res.status(200).json('deleted');
+        })
+        .catch(err => {
+            console.error(err);
+            res.status(500).send('Internal Server Error');
+        });
+});
+
+// client:
 router.delete('/delete-category/:id', checkLogin, checkAdminCategory, (req, res) => {
     Category.findOneAndDelete({ _id: req.params.id })
         .then(deletedCategory => {

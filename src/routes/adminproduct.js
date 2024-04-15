@@ -40,6 +40,21 @@ function authenticateToken(req, res, next) {
 /*
  * GET products index
  */
+
+// postman:
+router.get('/p-product', (req, res) => {
+    Product.find({}).exec()
+        .then(products => {
+            res.status(200).json(products);
+        })
+        .catch(err => {
+            // If an error occurs, send a 500 Internal Server Error response
+            console.error(err);
+            res.status(500).json({ error: 'Internal Server Error' });
+        });
+});
+
+// client:
 router.get('/', authenticateToken, checkLogin, checkAdminProduct, (req, res) => {
     let count;
 
@@ -93,94 +108,50 @@ router.get('/add-product', authenticateToken, checkLogin, checkAdminProduct, (re
  * POST add product
  */
 
-// router.post('/add-product', [
-//     body('title').notEmpty().withMessage('Title must have a value.'),
-//     body('desc').notEmpty().withMessage('Description must have a value.'),
-//     body('price').notEmpty().isDecimal().withMessage('Price must have a value.'),
-//     body('category').notEmpty().withMessage('Category must be selected.'),
-//     body('image').custom((value, { req }) => {
-//         if (!req.files || !req.files.image) {
-//             throw new Error('You must upload an image');
-//         }
-//         const imageFile = req.files.image;
-//         const extname = path.extname(imageFile.name).toLowerCase();
-//         if (extname !== '.png' && extname !== '.jpg' && extname !== '.jpeg' && extname !== '.gif') {
-//             throw new Error('Invalid image format. Only PNG, JPG, JPEG, and GIF are allowed.');
-//         }
-//         return true;
-//     }),
-// ], (req, res) => {
-//     let imageFile = "";
-//     if (req.files && req.files.image) {
-//         imageFile = req.files.image.name;
-//     };
+// postman:
+router.post('/p-addproduct', [
+    body('title').notEmpty().withMessage('Title must have a value.'),
+    body('desc').notEmpty().withMessage('Description must have a value.'),
+    body('price').isDecimal().withMessage('Price must have a value.')
+], (req, res) => {
 
-//     // const errors = validationResult(req);
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.status(400).json({ errors: errors.array() });
+    }
 
-//     // if (!errors.isEmpty()) {
-//     //     // If there are validation errors, render the form again with error messages
-//     //     Category.find()
-//     //         .then(categories => {
-//     //             const categoriesObject = categories.map(category => mongooseToObject(category));
-//     //             res.render('admin/add_product', {
-//     //                 errors: errors.array(),
-//     //                 title: req.body.title,
-//     //                 desc: req.body.desc,
-//     //                 categories: categoriesObject,
-//     //                 price: req.body.price,
-//     //                 layout: 'adminmain'
-//     //             });
-//     //         })
-//     //         .catch(err => {
-//     //             console.error(err);
-//     //             res.status(500).send('Internal Server Error');
-//     //         });
-//     // } else {
-//         // No validation errors, proceed to create the product
-//         const title = req.body.title;
-//         const slug = title.replace(/\s+/g, '-').toLowerCase();
-//         const desc = req.body.desc;
-//         const price = parseFloat(req.body.price).toFixed(2);
-//         const category = req.body.category;
+    const { title, desc, price, category, image } = req.body;
 
-//         // Check if product with the same title already exists
-//         Product.findOne({ title: title })
-//             .then(product => {
-//                 if (product) {
-//                     //res.json('existed');
-//                     // If product already exists, display an error message
-//                     //req.flash('danger', 'Product title exists, choose another.');
-//                     //return res.redirect('/adminproduct');
-//                     return res.status(400).json('product already exists');
-//                 } else {
-//                     // Create a new product
-//                     const newProduct = new Product({
-//                         title: title,
-//                         slug: slug,
-//                         desc: desc,
-//                         price: price,
-//                         category: category,
-//                         image: imageFile
-//                     }) 
-                    
+    // Kiểm tra xem sản phẩm đã tồn tại chưa
+    Product.findOne({ title: title })
+        .then(existingProduct => {
+            if (existingProduct) {
+                return res.status(400).json({ error: 'Product title exists, choose another.' });
+            } else {
+                // Tạo mới sản phẩm
+                const product = new Product({
+                    title: title,
+                    slug: title.replace(/\s+/g, '-').toLowerCase(),
+                    desc: desc,
+                    price: price,
+                    category: category,
+                    image: image // Lưu tên của hình ảnh được nhập từ postman
+                });
 
-//                     // Save the new product to the database
-//                     return newProduct.save();
-//                 }
-//             })
-//             .then(() => {
-//                 // Redirect to the product list page with a success message
-//                 req.flash('success', 'Product added!');
-//                 res.json('created');
-//             })
-//             .catch(err => {
-//                 console.error(err);
-//                 res.status(500).send('Internal Server Error');
-//             })
-//     //}
-// });
+                return product.save();
+            }
+        })
+        .then(newProduct => {
+            return res.status(201).json('created');
+        })
+        .catch(err => {
+            console.error(err);
+            res.status(500).json({ error: 'Internal Server Error' });
+        });
+});
 
 
+// client:
 router.post('/add-product', [
     body('title').notEmpty().withMessage('Title must have a value.'),
     body('desc').notEmpty().withMessage('Description must have a value.'),
@@ -349,86 +320,44 @@ router.get('/edit-product/:id', authenticateToken, checkLogin, checkAdminProduct
 /*
  * PUT edit product
  */
-// router.put('/edit-product/:id', [
-//     body('title').notEmpty().withMessage('Title must have a value.'),
-//     body('desc').notEmpty().withMessage('Description must have a value.'),
-//     body('price').isDecimal().withMessage('Price must have a value.'),
-//     body('image').custom((value, { req }) => {
-//         if (req.files && req.files.image) {
-//             return req.files.image.mimetype.startsWith('image');
-//         }
-//         return true; // Không có hình ảnh mới
-//     }).withMessage('You must upload an image')
-// ], (req, res) => {
 
-//     const id = req.params.id;
-//     const title = req.body.title;
-//     const slug = title.replace(/\s+/g, '-').toLowerCase();
-//     const desc = req.body.desc;
-//     const price = req.body.price;
-//     const category = req.body.category;
-//     const pimage = req.body.pimage;
-//     const errors = validationResult(req);
+// postman:
+router.put('/p-editproduct/:id', (req, res) => {
+    const id = req.params.id;
+    const { title, desc, price, category, pimage } = req.body;
+    const slug = title.replace(/\s+/g, '-').toLowerCase();
 
-//     if (!errors.isEmpty()) {
-//         return res.status(400).json({ errors: errors.array() });
-//     }
+    Product.findById(id)
+        .then(product => {
+            if (!product) {
+                return res.status(404).json({ error: 'Product not found' });
+            }
 
-//     Product.findById(id)
-//         .then(product => {
-//             if (!product) {
-//                 return res.status(404).json({ error: 'Product not found' });
-//             }
+            product.title = title;
+            product.slug = slug;
+            product.desc = desc;
+            product.price = parseFloat(price).toFixed(2);
+            product.category = category;
 
-//             product.title = title;
-//             product.slug = slug;
-//             product.desc = desc;
-//             product.price = parseFloat(price).toFixed(2);
-//             product.category = category;
+            if (req.files && req.files.image) {
+                const imageFile = req.files.image.name;
+                product.image = imageFile;
+            }
 
-//             //if (req.files && req.files.image) {
-//                 const imageFile = req.files.image.name;
-//                 product.image = imageFile;
-            
-//                 // Xử lý hình ảnh mới
-//                 const productImage = req.files.image;
-//                 console.log(productImage);
-//                 const path = `/img/${imageFile}`;
-//                 productImage.mv(path, (err) => {
-//                     if (err) {
-//                         console.error(err);
-//                         return res.status(500).json({ error: 'Internal Server Error' });
-//                     }
-//                 });
-            
-//                 // Xóa hình ảnh cũ
-//                 if (pimage) {
-//                     const oldImagePath = `/img/${pimage}`;
-//                     console.log(oldImagePath);
-//                     fs.remove(oldImagePath, (err) => {
-//                         if (err) {
-//                             console.error(err);
-//                             return res.status(500).json({ error: 'Internal Server Error' });
-//                         }
-//                     });
-//                 }
-//             //}
-            
-            
-
-//             return product.save();
-//         })
-//         .then(() => {
-//             req.flash('success', 'Product edited!');
-//             res.status(200).json({ message: 'Product edited successfully' });
-//         })
-//         .catch(err => {
-//             console.error(err);
-//             res.status(500).json({ error: 'Internal Server Error' });
-//         });
-// });
+            return product.save();
+        })
+        .then(() => {
+            //res.status(200).json({ message: 'Product edited successfully' });
+            res.status(200).json('Product edited successfully');
+        })
+        .catch(err => {
+            console.error(err);
+            res.status(500).json({ error: 'Internal Server Error' });
+        });
+});
 
 
+// client:
 router.put('/edit-product/:id', checkLogin, checkAdminProduct, (req, res) => {
     const id = req.params.id;
     const title = req.body.title;
@@ -509,6 +438,27 @@ router.put('/edit-product/:id', checkLogin, checkAdminProduct, (req, res) => {
 /*
  * DELETE remove product
  */
+
+// postman:
+router.delete('/p-deleteproduct/:id', (req, res) => {
+    const id = req.params.id;
+
+    Product.findByIdAndDelete(id)
+        .then(deletedProduct => {
+            if (!deletedProduct) {
+                return res.status(404).json({ error: 'Product not found' });
+            }
+            //res.status(200).json({ message: 'Product deleted successfully' });
+            res.status(200).json('Product deleted successfully');
+        })
+        .catch(error => {
+            console.error(error);
+            res.status(500).json({ error: 'Internal Server Error' });
+        });
+});
+
+
+// client:
 router.delete('/delete-product/:id', checkLogin, checkAdminProduct, (req, res) => {
     const id = req.params.id;
 
@@ -531,15 +481,13 @@ router.delete('/delete-product/:id', checkLogin, checkAdminProduct, (req, res) =
         })
         .then(() => {
             req.flash('success', 'Product deleted!');
-            res.status(200).json({ message: 'Product deleted successfully' });
+            res.status(200).redirect('/adminproduct');
         })
         .catch(error => {
             console.error(error);
             res.status(500).json({ error: 'Internal Server Error' });
         });
 });
-
-
 
 
 module.exports = router;
