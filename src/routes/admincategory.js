@@ -2,6 +2,13 @@ const express = require('express');
 const router = express.Router();
 const { body, validationResult } = require('express-validator');
 const { mongooseToObject } = require('../util/mongoose');
+const jwt = require('jsonwebtoken');
+
+
+// Import middleware checkLogin
+const checkLogin = require('../middleware/checklogin');
+const checkAdminCategory = require('../middleware/checkrole');
+
 
 var Category = require('../app/models/category');
 
@@ -22,8 +29,27 @@ var Category = require('../app/models/category');
 //         });
 // });
 
+function authenticateToken(req, res, next) {
+    const token = req.cookies.token;
+
+    if (token) {
+        try {
+            const decodedToken = jwt.verify(token, 'pass');
+            req.accountId = decodedToken._id; // Lưu id của người dùng vào request để sử dụng trong các route sau
+            req.isLoggedIn = true; // Đánh dấu người dùng đã đăng nhập
+        } catch (error) {
+            console.error(error);
+        }
+    } else {
+        req.isLoggedIn = false; // Đánh dấu người dùng chưa đăng nhập
+    }
+
+    // Tiếp tục middleware dù có token hay không
+    next();
+}
+
 // return rendered page:
-router.get('/', (req, res) => {
+router.get('/', authenticateToken, checkLogin, checkAdminCategory, (req, res) => { // Áp dụng middleware checkLogin và checkAdminCategory
     // Find all categories
     Category.find()
         .then(categories => {
@@ -33,6 +59,7 @@ router.get('/', (req, res) => {
             // Render the handlebars template with the converted categories
             res.render('admin/categories', {
                 categories: categoriesObject,
+                isLoggedIn: req.isLoggedIn,
                 layout: 'adminmain'
             });
         })
@@ -46,12 +73,13 @@ router.get('/', (req, res) => {
 /*
  * GET add category
  */
-router.get('/add-category', (req, res, next) => {
+router.get('/add-category', authenticateToken, checkLogin, checkAdminCategory, (req, res, next) => {
 
     var title = "";
 
     res.render('admin/add_category', {
         title: title,
+        isLoggedIn: req.isLoggedIn,
         layout: 'adminmain'
     });
 
@@ -63,7 +91,7 @@ router.get('/add-category', (req, res, next) => {
 
 router.post('/add-category', [
     body('title').notEmpty().withMessage('Title must have a value.'),
-], (req, res) => {
+], checkLogin, checkAdminCategory, (req, res) => {
 
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -99,7 +127,7 @@ router.post('/add-category', [
 /*
  * GET edit category
  */
-router.get('/edit-category/:id', (req, res) => {
+router.get('/edit-category/:id', authenticateToken, checkLogin, checkAdminCategory, (req, res) => {
 
     Category.findById(req.params.id)
         .then(category => {
@@ -109,6 +137,7 @@ router.get('/edit-category/:id', (req, res) => {
             res.render('admin/edit_category', {
                 title: category.title,
                 id: category._id,
+                isLoggedIn: req.isLoggedIn,
                 layout: 'adminmain'
             });
         })
@@ -123,7 +152,7 @@ router.get('/edit-category/:id', (req, res) => {
  */
 router.put('/edit-category/:id', [
     body('title').notEmpty().withMessage('Title must have a value.')
-], (req, res) => {
+], checkLogin, checkAdminCategory, (req, res) => {
 
     const id = req.params.id;
     const title = req.body.title;
@@ -163,7 +192,7 @@ router.put('/edit-category/:id', [
 /*
  * DELETE remove category
  */
-router.delete('/delete-category/:id', (req, res) => {
+router.delete('/delete-category/:id', checkLogin, checkAdminCategory, (req, res) => {
     Category.findOneAndDelete({ _id: req.params.id })
         .then(deletedCategory => {
             if (!deletedCategory) {

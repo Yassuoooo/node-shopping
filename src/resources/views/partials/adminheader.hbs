@@ -7,25 +7,18 @@
     <div class="collapse navbar-collapse" id="navbarSupportedContent">
       <ul class="navbar-nav me-auto mb-2 mb-lg-0">
         <li class="nav-item">
-          <a class="nav-link active" aria-current="page" href="/">Admin Home</a>
-        </li>
-        <li class="nav-item dropdown">
-          <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-            User
-          </a>
-          <ul class="dropdown-menu">
-            <li><a class="dropdown-item" href="/courses/create">Create</a></li>
-            <div class="dropdown-divider"></div>
-            <li><a class="dropdown-item" href="/me/stored/courses">Course List</a></li>
-            <div class="dropdown-divider"></div>
-            <li><a class="dropdown-item" href="#">Log out</a></li>
-          </ul>
+          <a class="nav-link active" aria-current="page" href="/admin">Admin Home</a>
         </li>
         {{#each pages}}
           <li class="nav-item">
             <a class="nav-link" href="/{{slug}}">{{title}}</a>
           </li>
         {{/each}}
+        {{#if isLoggedIn}}
+            <li><a href="/account/logout"><i class="fa fa-sign-out"></i> Logout</a></li>
+         {{else}}
+            <li><a href="/account/login"><i class="fa fa-lock"></i> Login</a></li>
+        {{/if}}
       </ul>
     </div>
   </div>

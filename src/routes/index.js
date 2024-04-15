@@ -1,3 +1,4 @@
+
 // Import các route children:
 const homeRouter = require('./home'); 
 const adminHomeRouter = require('./adminhome');
@@ -7,6 +8,7 @@ const productAdminRouter = require('./adminproduct');
 const pagesRouter = require('./pages');
 const productRouter = require('./product');
 const cartRouter = require('./cart');
+const accountRouter = require('./account');
 
 
 
@@ -14,9 +16,7 @@ const cartRouter = require('./cart');
 function route(app) {
     // tạo hàm route và truyền vào instance app của express
 
-    //app.use('/home', homeRouter); // truyền vào path và function handler
-
-    app.use('/adminhome', adminHomeRouter);
+    app.use('/admin', adminHomeRouter);
 
     app.use('/adminpage', pageAdminRouter);
 
@@ -28,9 +28,12 @@ function route(app) {
 
     app.use('/cart', cartRouter);
 
-    app.use('/', pagesRouter);
+    app.use('/account', accountRouter);
 
-    
+
+    //app.use('/home', homeRouter); // truyền vào path và function handler
+
+    app.use('/', pagesRouter);
     
 }
 

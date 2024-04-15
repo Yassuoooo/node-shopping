@@ -14,7 +14,13 @@ const Cart = new Schema({
         }
     ],
     total: { type: Number, required: true },
-    createdAt: { type: Date, default: Date.now }
+    createdAt: { type: Date, default: Date.now },
+    user: [
+        {
+            username: { type: String, required: true },
+            userId: { type: Schema.Types.ObjectId, ref: 'Account' }
+        }
+    ]
 }, {
     timestamps: true
 });

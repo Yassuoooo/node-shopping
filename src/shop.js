@@ -3,6 +3,8 @@ const express = require('express'); // khởi tạo express và import express
 const handlebars = require('express-handlebars').engine;
 const bodyParser = require('body-parser');
 const session = require('express-session');
+const jwt = require('jsonwebtoken');
+const cookieParser = require('cookie-parser');
 const { body, validationResult } = require('express-validator');
 const methodOverride = require('method-override');
 //var expressValidator = require('express-validator');
@@ -27,6 +29,8 @@ app.use(body());
 
 // Express fileUpload middleware
 app.use(fileUpload());
+
+app.use(cookieParser());
 
 
 
@@ -193,6 +197,9 @@ app.engine(
         },
         json: function (context) {
             return JSON.stringify(context);
+        },
+        inc: function(value, options) {
+            return parseInt(value) + 1;
         }
       }
     }),
@@ -211,13 +218,6 @@ app.use(bodyParser.json())
 
 
 // Express Session:
-// app.use(session({
-//     secret: 'keyboard cat',
-//     resave: false,
-//     saveUninitialized: true,
-//     cookie: { secure: true }
-//   }))
-
 const CryptoJS = require('crypto-js');
 
 // Tạo một chuỗi ngẫu nhiên có độ dài 32 ký tự

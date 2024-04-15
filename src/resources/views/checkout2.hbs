@@ -2,6 +2,9 @@
     <h1 class="page-title">My Cart</h1>
     <br><br>
 
+    <!-- Thêm phần hiển thị userId -->
+    <p>User ID: {{ userId }}</p>
+    <p>User Name: {{ username }}</p>
     <table class="table table-striped alignmiddle">
         
         <tr>
@@ -39,7 +42,7 @@
                 <a class="clearcart btn btn-danger" href="/cart/clear">Clear cart</a>
             </td>
             <td colspan="5" align="right">
-                <a class="btn btn-primary buynow" href="#">Buy now</a>
+                <a class="btn btn-primary buynow" href="/cart/buynow">Buy now</a>
             </td>
         </tr>
         
@@ -60,60 +63,40 @@ function calculateTotal(cart) {
     return total.toFixed(2);
 }
 
-
 // Hàm cập nhật giao diện người dùng
-// Hàm cập nhật giao diện người dùng
-function updateUI(title, action, cart) {
-    const product = document.querySelectorAll('.cart-table');
-    const productElement = document.querySelector(`[data-title="${title}"]`);
-    const qtyElement = productElement ? productElement.parentElement.querySelector('.qty-display') : null;
+function updateUI(cart) {
+    cart.forEach(item => {
+        const productElement = document.querySelector(`[data-title="${item.title}"]`);
+        if (productElement) {
+            const qtyElement = productElement.parentElement.querySelector('.qty-display');
+            const subtotalElement = productElement.parentElement.nextElementSibling;
 
-    if (qtyElement) {
-        let qty = parseInt(qtyElement.textContent);
+            if (qtyElement) {
+                // Cập nhật số lượng sản phẩm
+                qtyElement.textContent = item.qty;
 
-        // Cập nhật số lượng sản phẩm dựa vào hành động
-        if (action === 'add') {
-            qty++;
-        } else if (action === 'remove') {
-            qty--;
-        } else {
-            qty = 0;
+                // Xóa sản phẩm khỏi giỏ hàng nếu số lượng là 0
+                if (item.qty === 0) {
+                    productElement.parentElement.remove();
+                }
+
+                // Cập nhật tổng tiền cho sản phẩm
+                subtotalElement.textContent = `$${(parseFloat(item.price) * item.qty).toFixed(2)}`;
+            }
         }
+    });
 
-        // Cập nhật số lượng sản phẩm trên giao diện người dùng
-        qtyElement.textContent = qty;
-
-        // Xóa sản phẩm khỏi giỏ hàng nếu số lượng là 0
-        if (qty === 0) {
-            productElement.parentElement.remove();
-        }
-
-        const priceElement = product.querySelector('.product-price');
-            const price = parseFloat(priceElement.getAttribute('data-price'));
-            const subtotalElement = product.querySelector('.product-subtotal');
-            const subtotal = calculateSubtotal(price, qty);
-            subtotalElement.textContent = `$${subtotal}`;
-
-        // Cập nhật tổng giá trị của giỏ hàng
-        const cartTotalElement = document.querySelector('#cart-total');
-        if (cartTotalElement) {
-            cartTotalElement.textContent = `$${calculateTotal(cart)}`;
-        } else {
-            console.error('Cart total element not found');
-        }
-
+    // Cập nhật tổng giá trị của giỏ hàng
+    const cartTotalElement = document.querySelector('#cart-total');
+    if (cartTotalElement) {
+        cartTotalElement.textContent = `$${calculateTotal(cart)}`;
     } else {
-        console.error('Quantity element not found');
+        console.error('Cart total element not found');
     }
 }
 
 
 document.addEventListener('DOMContentLoaded', function () {
-   
-    // Nhúng dữ liệu giỏ hàng vào biến JavaScript
-    const cartData = {{{json cart}}};
-
-
     const cartActions = document.querySelectorAll('.cart-action');
     cartActions.forEach(function (action) {
         action.addEventListener('click', function (event) {
@@ -122,14 +105,17 @@ document.addEventListener('DOMContentLoaded', function () {
             const dataTitle = this.getAttribute('data-title');
 
             fetch(`/cart/update/${dataTitle}?action=${dataAction}`, {
-                method: 'PUT'
+                method: 'POST' // Sử dụng phương thức POST
             })
             .then(response => {
                 if (!response.ok) {
                     throw new Error('Network response was not ok');
                 }
-                // Xử lý phản hồi thành công
-                updateUI(dataTitle, dataAction, );
+                return response.json();
+            })
+            .then(data => {
+                // Cập nhật giao diện sau khi cập nhật giỏ hàng
+                updateUI(data.cart);
             })
             .catch(error => {
                 console.error('There was a problem with your fetch operation:', error);
@@ -137,6 +123,41 @@ document.addEventListener('DOMContentLoaded', function () {
             });
         });
     });
+
+    // 
+    const buyNowButton = document.querySelector('.buynow'); // Lấy button Buy now
+
+    if (buyNowButton) {
+        buyNowButton.addEventListener('click', function (event) {
+            event.preventDefault();
+
+            // Gọi API để lưu đơn hàng vào MongoDB
+            fetch('/cart/checkout2', {
+                method: 'POST'
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then(data => {
+                // Xử lý sau khi đơn hàng được lưu thành công
+                //alert('Order placed successfully!');
+                // Chuyển hướng sang trang order-success.hbs sau khi đặt hàng thành công
+                window.location.href = '/cart/order_success';
+            })
+            .catch(error => {
+                console.error('There was a problem with your fetch operation:', error);
+                // Xử lý lỗi
+            });
+        });
+    }
+
+
 });
+
+
+
 
 </script>

@@ -1,23 +1,19 @@
+const express = require('express');
+const router = express.Router();
+
+var Product = require('../../app/models/product');
+
+const productRouter = require('../../routes/product'); // Đường dẫn tới file xử lý product
 
 class HomeController {
     // function constructor
 
     // GET /news: cấu hình cho route news
     index(req, res) {
-        res.render('home');
+        res.render('home', {
+            layout: 'main'
+        });
     }
-    // about(req, res) {
-    //     res.render('about');
-    // }
-    // services(req, res) {
-    //     res.render('services');
-    // }
-    // blog(req, res) {
-    //     res.render('blog');
-    // }
-    // contact(req, res) {
-    //     res.render('contact');
-    // }
 
 }
 

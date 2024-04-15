@@ -1,7 +1,8 @@
 
 const mongoose = require('mongoose')
 const Schema = mongoose.Schema 
-const ObjectId = Schema.ObjectId 
+const ObjectId = Schema.ObjectId
+const paginate = require('mongoose-paginate-v2'); 
 
 const Product = new Schema({
     title: { type: String, required: true },
@@ -13,5 +14,8 @@ const Product = new Schema({
 }, {
     timestamps: true
 });
+
+// Sử dụng paginate như một plugin cho schema của Product
+Product.plugin(paginate);
 
 module.exports = mongoose.model('Product', Product); 

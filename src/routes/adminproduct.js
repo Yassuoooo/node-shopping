@@ -6,7 +6,11 @@ const mkdirp = require('mkdirp');
 const { mongooseToObject } = require('../util/mongooseToObject');
 const fs = require('fs');
 const path = require('path');
+const jwt = require('jsonwebtoken');
 
+
+const checkLogin = require('../middleware/checklogin');
+const checkAdminProduct = require('../middleware/checkrole');
 
 var Product = require('../app/models/product');
 var Category = require('../app/models/category');
@@ -14,10 +18,29 @@ var Category = require('../app/models/category');
 //const productDir = path.join(__dirname, '../product_images', newProduct._id.toString());
 
 
+function authenticateToken(req, res, next) {
+    const token = req.cookies.token;
+
+    if (token) {
+        try {
+            const decodedToken = jwt.verify(token, 'pass');
+            req.accountId = decodedToken._id; // Lưu id của người dùng vào request để sử dụng trong các route sau
+            req.isLoggedIn = true; // Đánh dấu người dùng đã đăng nhập
+        } catch (error) {
+            console.error(error);
+        }
+    } else {
+        req.isLoggedIn = false; // Đánh dấu người dùng chưa đăng nhập
+    }
+
+    // Tiếp tục middleware dù có token hay không
+    next();
+}
+
 /*
  * GET products index
  */
-router.get('/', (req, res) => {
+router.get('/', authenticateToken, checkLogin, checkAdminProduct, (req, res) => {
     let count;
 
     Product.countDocuments()
@@ -30,6 +53,7 @@ router.get('/', (req, res) => {
             res.render('admin/products', {
                 products: productsArray,
                 count: count,
+                isLoggedIn: req.isLoggedIn,
                 layout: 'adminmain'
             });
         })
@@ -42,7 +66,7 @@ router.get('/', (req, res) => {
 /*
  * GET add product
  */
-router.get('/add-product', (req, res) => {
+router.get('/add-product', authenticateToken, checkLogin, checkAdminProduct, (req, res) => {
     const title = "";
     const desc = "";
     const price = "";
@@ -55,6 +79,7 @@ router.get('/add-product', (req, res) => {
                 desc: desc,
                 categories: categoriesObject,
                 price: price,
+                isLoggedIn: req.isLoggedIn,
                 layout: 'adminmain'
             });
         })
@@ -166,7 +191,7 @@ router.post('/add-product', [
         }
         return true;
     })
-], (req, res) => {
+], checkLogin, checkAdminProduct, (req, res) => {
 
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -281,7 +306,7 @@ router.post('/add-product', [
 // });
 
 
-router.get('/edit-product/:id', (req, res) => {
+router.get('/edit-product/:id', authenticateToken, checkLogin, checkAdminProduct, (req, res) => {
     Product.findById(req.params.id)
         .then(product => {
             if (!product) {
@@ -302,7 +327,9 @@ router.get('/edit-product/:id', (req, res) => {
                         category: product.category.replace(/\s+/g, '-').toLowerCase(),
                         price: parseFloat(product.price).toFixed(2),
                         image: product.image,
-                        id: product._id
+                        id: product._id,
+                        isLoggedIn: req.isLoggedIn,
+                        layout: 'adminmain'
                     });
                 })
                 .catch(err => {
@@ -402,7 +429,7 @@ router.get('/edit-product/:id', (req, res) => {
 // });
 
 
-router.put('/edit-product/:id', (req, res) => {
+router.put('/edit-product/:id', checkLogin, checkAdminProduct, (req, res) => {
     const id = req.params.id;
     const title = req.body.title;
     const slug = title.replace(/\s+/g, '-').toLowerCase();
@@ -469,7 +496,8 @@ router.put('/edit-product/:id', (req, res) => {
         })
         .then(() => {
             req.flash('success', 'Product edited!');
-            res.status(200).json({ message: 'Product edited successfully' });
+            //res.status(200).json({ message: 'Product edited successfully' });
+            res.redirect('/adminproduct');
         })
         .catch(err => {
             console.error(err);
@@ -481,7 +509,7 @@ router.put('/edit-product/:id', (req, res) => {
 /*
  * DELETE remove product
  */
-router.delete('/delete-product/:id', (req, res) => {
+router.delete('/delete-product/:id', checkLogin, checkAdminProduct, (req, res) => {
     const id = req.params.id;
 
     Product.findById(id)

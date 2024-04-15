@@ -3,7 +3,7 @@ class AdminController {
 
     // GET /news: cấu hình cho route news
     index(req, res) {
-        res.render('home', {
+        res.render('admin/adminhome', {
             layout: 'adminmain'
         });
     }

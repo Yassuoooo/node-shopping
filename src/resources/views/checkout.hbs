@@ -1,55 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <title>Cart | E-Shopper</title>
+    <link href="/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/css/font-awesome.min.css" rel="stylesheet">
+    <link href="/css/prettyPhoto.css" rel="stylesheet">
+    <link href="/css/price-range.css" rel="stylesheet">
+    <link href="/css/animate.css" rel="stylesheet">
+	<link href="/css/main.css" rel="stylesheet">
+	<link href="/css/responsive.css" rel="stylesheet">
+    <!--[if lt IE 9]>
+    <script src="js/html5shiv.js"></script>
+    <script src="js/respond.min.js"></script>
+    <![endif]-->       
+    <link rel="shortcut icon" href="/img/images/ico/favicon.ico">
+    <link rel="apple-touch-icon-precomposed" sizes="144x144" href="/img/images/ico/apple-touch-icon-144-precomposed.png">
+    <link rel="apple-touch-icon-precomposed" sizes="114x114" href="/img/images/ico/apple-touch-icon-114-precomposed.png">
+    <link rel="apple-touch-icon-precomposed" sizes="72x72" href="/img/images/ico/apple-touch-icon-72-precomposed.png">
+    <link rel="apple-touch-icon-precomposed" href="/img/images/ico/apple-touch-icon-57-precomposed.png">
+</head><!--/head-->
+
+<body>
+	<header id="header"><!--header-->
+		
+		<div class="header-middle"><!--header-middle-->
+			<div class="container">
+				<div class="row">
+					<div class="col-sm-4">
+						<div class="logo pull-left">
+							<a href="index.html"><img src="/img/images/home/logo.png" alt="" /></a>
+						</div>
+					</div>
+					<div class="col-sm-8">
+						<div class="shop-menu pull-right">
+							<ul class="nav navbar-nav">
+								<li><a href="/account/account-info"><i class="fa fa-user"></i> Account</a></li>
+								{{#if isLoggedIn}}
+                                    <li><a href="/account/logout"><i class="fa fa-sign-out"></i> Logout</a></li>
+                                {{else}}
+                                    <li><a href="/account/login"><i class="fa fa-lock"></i> Login</a></li>
+                                {{/if}}						
+							</ul>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div><!--/header-middle-->
+	
+		<div class="header-bottom"><!--header-bottom-->
+			<div class="container">
+				<div class="row">
+					<div class="col-sm-9">
+						<div class="navbar-header">
+							<button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+								<span class="sr-only">Toggle navigation</span>
+								<span class="icon-bar"></span>
+								<span class="icon-bar"></span>
+								<span class="icon-bar"></span>
+							</button>
+						</div>
+						<div class="mainmenu pull-left">
+							<ul class="nav navbar-nav collapse navbar-collapse">
+								{{#each pages}}
+									<li class="active">
+										<a class="active" href="/{{slug}}">{{title}}</a>
+									</li>
+								{{/each}}
+								<li class="dropdown"><a href="#">Shop<i class="fa fa-angle-down"></i></a>
+                                    <ul role="menu" class="sub-menu">
+                                        <li><a href="shop.html">Products</a></li>
+										<li><a href="cart.html">Cart</a></li> 
+										<li><a href="login.html">Login</a></li> 
+                                    </ul>
+                                </li>
+							</ul>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div><!--/header-bottom-->
+	</header><!--/header-->
 {{#if cart}}
-    <h1 class="page-title">My Cart</h1>
-    <br><br>
+	<section id="cart_items">
+		<div class="container">
+			<div class="breadcrumbs">
+				<ol class="breadcrumb">
+				  <li><a href="#">Home</a></li>
+				  <li class="active">Shopping Cart</li>
+				</ol>
+			</div>
+			<div class="table-responsive cart_info">
+				<table class="table table-condensed">
+					<thead>
+						<tr class="cart_menu">
+							<td class="image">Item</td>
+							<td>Title</td>
+							{{!-- <td class="description"></td> --}}
+							<td class="price">Price</td>
+                            <td></td>
+							<td class="quantity">Quantity</td>
+                            {{!-- <td></td> --}}
+							<td>Subtotal</td>
+						</tr>
+					</thead>
+					<tbody>
+						{{#each cart}}
+						<tr>			
+							<td class="cart_product">
+								<a href=""><img src="{{ image }}" alt=""></a>
+							</td>
+							<td class="cart_description">
+								<h4><a href="">{{ title }}</a></h4>
+							</td>
+							<td class="cart_price product-price" data-price="{{ price }}">
+								<p>${{ price }}</p>
+							</td>
+							<td class="cart_quantity">
+                                <div class="cart_quantity_button">
+                                    <td class="cart-table">
+                                        <span class="qty-display">{{ qty }}</span>
+                                        <button class="cart-action cart_quantity_up" data-action="add" data-title="{{ title }}">+</button>&nbsp;                         
+                                        <button class="cart-action cart_quantity_down" data-action="remove" data-title="{{ title }}">-</button>&nbsp;
+                                        <button class="cart-action" data-action="clear" data-title="{{ title }}">Clear</button>&nbsp;
+                                    </td>
+                                    <td class="product-subtotal">${{ calculateSubtotal price qty }}</td>
+                                </div>					
+							</td>
+						</tr>
+						{{/each}}
+                        <td class="cart_total">
+							Total: <p class="cart_total_price cart-total">${{ calculateTotal cart }}</p>
+						</td>
+					</tbody>
+				</table>
+			</div>
+		</div>
+	</section> <!--/#cart_items-->
+	<!-- Nút Buy Now -->
+    <div class="text-center">
+        <button class="btn btn-primary buynow" href="/cart/buynow">Buy Now</button>
+    </div>
 
-    <table class="table table-striped alignmiddle">
-        
-        <tr>
-            <th>Image</th>
-            <th>Title</th>
-            <th>Price</th>
-            <th>Quantity</th>
-            <th></th>
-            <th>Subtotal</th>
-        </tr>
-
-        {{!-- Lặp qua từng sản phẩm trong giỏ hàng --}}
-        {{#each cart}}
-            <tr>
-                <td><img class="cpi" src="{{ image }}" alt=""></td>
-                <td>{{ title }}</td>
-                <td class="product-price" data-price="{{ price }}">${{ price }}</td>
-                <td class="cart-table">
-                    <span class="qty-display">{{ qty }}</span>
-                    <button class="cart-action" data-action="add" data-title="{{ title }}">+</button>&nbsp;
-                    <button class="cart-action" data-action="remove" data-title="{{ title }}">-</button>&nbsp;
-                    <button class="cart-action" data-action="clear" data-title="{{ title }}">Clear</button>&nbsp;
-                </td>
-                <td class="product-subtotal">${{ calculateSubtotal price qty }}</td>
-            </tr>
-        {{/each}}
-
-
-        <tr>
-            <td colspan="6" align="right" id="cart-total"><b>Total: </b> ${{ calculateTotal cart }}</td>
-        </tr>
-
-        <tr>
-            <td colspan="5" align="right">
-                <a class="clearcart btn btn-danger" href="/cart/clear">Clear cart</a>
-            </td>
-            <td colspan="5" align="right">
-                <a class="btn btn-primary buynow" href="/cart/buynow">Buy now</a>
-            </td>
-        </tr>
-        
-    </table>
-
+    <!-- Nút Clear Cart -->
+    <div class="text-center">
+        <button class="btn btn-danger clearcart" href="/cart/clear">Clear Cart</button>
+    </div>
 {{else}}
     <h3 class="text-center">Your cart is empty.</h3>
 {{/if}}
+	
 
-<script>
+	<footer id="footer"><!--Footer-->
+		
+		<div class="footer-widget">
+			<div class="container">
+				<div class="row">
+					<div class="col-sm-2">
+						<div class="single-widget">
+							<h2>Service</h2>
+							
+						</div>
+					</div>
+					<div class="col-sm-2">
+						<div class="single-widget">
+							<h2>Quock Shop</h2>
+							
+						</div>
+					</div>
+					<div class="col-sm-2">
+						<div class="single-widget">
+							<h2>Policies</h2>
+							
+						</div>
+					</div>
+					<div class="col-sm-2">
+						<div class="single-widget">
+							<h2>About Shopper</h2>
+							
+						</div>
+					</div>
+					
+				</div>
+			</div>
+		</div>
+		
+		<div class="footer-bottom">
+			<div class="container">
+				<div class="row">
+					<p class="pull-left">Copyright © 2013 E-SHOPPER Inc. All rights reserved.</p>
+					<p class="pull-right">Designed by <span><a target="_blank" href="http://www.themeum.com">Themeum</a></span></p>
+				</div>
+			</div>
+		</div>
+		
+	</footer><!--/Footer-->
+	
+
+
+    <script src="/js/jquery.js"></script>
+	<script src="/js/bootstrap.min.js"></script>
+	<script src="/js/jquery.scrollUp.min.js"></script>
+    <script src="/js/jquery.prettyPhoto.js"></script>
+    <script src="/js/main.js"></script>
+
+    <script>
 
 // Hàm tính tổng giá trị của giỏ hàng
 function calculateTotal(cart) {
@@ -84,7 +242,7 @@ function updateUI(cart) {
     });
 
     // Cập nhật tổng giá trị của giỏ hàng
-    const cartTotalElement = document.querySelector('#cart-total');
+    const cartTotalElement = document.querySelector('.cart-total');
     if (cartTotalElement) {
         cartTotalElement.textContent = `$${calculateTotal(cart)}`;
     } else {
@@ -153,8 +311,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
 
 });
-
-
-
-
 </script>
+    
+</body>
+</html>

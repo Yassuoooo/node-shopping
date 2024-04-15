@@ -2,10 +2,16 @@ const express = require('express');
 const router = express.Router();
 const { body, validationResult } = require('express-validator');
 const { mongooseToObject } = require('../util/mongoose');
+const jwt = require('jsonwebtoken');
+
 
 // handlebars.registerHelper('eq', function(a, b, options) {
 //   return a === b ? options.fn(this) : options.inverse(this);
 // });
+
+// Import middleware checkLogin
+const checkLogin = require('../middleware/checklogin');
+const checkAdminPage = require('../middleware/checkrole');
 
 // Get Page model
 var Page = require('../app/models/page');
@@ -29,8 +35,27 @@ var Page = require('../app/models/page');
 //         });
 // });
 
+function authenticateToken(req, res, next) {
+    const token = req.cookies.token;
+
+    if (token) {
+        try {
+            const decodedToken = jwt.verify(token, 'pass');
+            req.accountId = decodedToken._id; // Lưu id của người dùng vào request để sử dụng trong các route sau
+            req.isLoggedIn = true; // Đánh dấu người dùng đã đăng nhập
+        } catch (error) {
+            console.error(error);
+        }
+    } else {
+        req.isLoggedIn = false; // Đánh dấu người dùng chưa đăng nhập
+    }
+
+    // Tiếp tục middleware dù có token hay không
+    next();
+}
+
 // return rendered page:
-router.get('/', (req, res) => {
+router.get('/', authenticateToken, checkLogin, checkAdminPage, (req, res) => {
     // Find all pages and sort them by sorting field
     Page.find({}).sort({ sorting: 1 }).exec()
     .then(pages => {
@@ -40,6 +65,7 @@ router.get('/', (req, res) => {
         // Render the handlebars template with the converted pages
         res.render('admin/pages', {
             pages: pagesObject,
+            isLoggedIn: req.isLoggedIn,
             layout: 'adminmain'
         });
     })
@@ -54,7 +80,7 @@ router.get('/', (req, res) => {
 /*
  * GET add page
  */
-router.get('/add-page', (req, res, next) => {
+router.get('/add-page', authenticateToken, checkLogin, checkAdminPage, (req, res, next) => {
 
     var title = "";
     var slug = "";
@@ -64,6 +90,7 @@ router.get('/add-page', (req, res, next) => {
         title: title,
         slug: slug,
         content: content,
+        isLoggedIn: req.isLoggedIn,
         layout: 'adminmain'
     });
 
@@ -76,7 +103,7 @@ router.get('/add-page', (req, res, next) => {
 router.post('/add-page', [
     body('title').notEmpty().withMessage('Title must have a value.'),
     body('content').notEmpty().withMessage('Content must have a value.')
-], (req, res) => {
+], checkLogin, checkAdminPage, (req, res) => {
 
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -118,7 +145,7 @@ router.post('/add-page', [
 /*
  * GET edit page
  */
-router.get('/edit-page/:id', (req, res) => {
+router.get('/edit-page/:id', authenticateToken, checkLogin, checkAdminPage, (req, res) => {
     Page.findById(req.params.id)
         .then(page => {
             if (!page) {
@@ -130,6 +157,7 @@ router.get('/edit-page/:id', (req, res) => {
                 slug: page.slug,
                 content: page.content,
                 id: page._id,
+                isLoggedIn: req.isLoggedIn,
                 layout: 'adminmain'
             });
         })
@@ -147,7 +175,7 @@ router.get('/edit-page/:id', (req, res) => {
 router.put('/edit-page/:id', [
     body('title').notEmpty().withMessage('Title must have a value.'),
     body('content').notEmpty().withMessage('Content must have a value.')
-], (req, res) => {
+], checkLogin, checkAdminPage, (req, res) => {
 
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -189,7 +217,7 @@ router.put('/edit-page/:id', [
 /*
  * DELETE remove page
  */
-router.delete('/delete-page/:id', (req, res) => {
+router.delete('/delete-page/:id', checkLogin, checkAdminPage, (req, res) => {
     Page.findOneAndDelete({ _id: req.params.id })
         .then(deletedPage => {
             if (!deletedPage) {

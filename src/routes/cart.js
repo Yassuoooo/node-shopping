@@ -1,17 +1,94 @@
 
 const express = require('express');
 const router = express.Router(); 
+const jwt = require('jsonwebtoken');
+const cookieParser = require('cookie-parser');
 
 // Get Product model
 var Product = require('../app/models/product');
 var Order = require('../app/models/cart');
+
+// Import middleware checkLogin
+const checkLogin = require('../middleware/checklogin');
 
 
 
 /*
  * GET add product to cart
  */
-router.get('/add/:product', async (req, res) => {
+// router.get('/add/:product', async (req, res) => {
+//     try {
+//         var slug = req.params.product;
+//         var p = await Product.findOne({ slug: slug });
+
+//         if (!p) {
+//             // Xử lý khi không tìm thấy sản phẩm
+//             console.log("Product not found");
+//             return res.status(404).send("Product not found");
+//         }
+
+//         if (typeof req.session.cart == "undefined") {
+//             req.session.cart = [];
+//             req.session.cart.push({
+//                 title: slug,
+//                 qty: 1,
+//                 price: parseFloat(p.price).toFixed(2),
+//                 image: '/product_images/' + p._id + '/' + p.image,
+//                 product_id: p._id // Thêm trường product_id với ObjectId của sản phẩm
+//             });
+//         } else {
+//             var cart = req.session.cart;
+//             var newItem = true;
+
+//             for (var i = 0; i < cart.length; i++) {
+//                 if (cart[i].title == slug) {
+//                     cart[i].qty++;
+//                     newItem = false;
+//                     break;
+//                 }
+//             }
+
+//             if (newItem) {
+//                 cart.push({
+//                     title: slug,
+//                     qty: 1,
+//                     price: parseFloat(p.price).toFixed(2),
+//                     image: '/product_images/' + p._id + '/' + p.image,
+//                     product_id: p._id // Thêm trường product_id với ObjectId của sản phẩm
+//                 });
+//             }
+//         }
+
+//         req.flash('success', 'Product added!');
+//         res.redirect('back');
+//     } catch (err) {
+//         console.log(err);
+//         res.status(500).send("Server Error");
+//     }
+// });
+
+// Middleware để kiểm tra token và xác minh người dùng đã đăng nhập hay chưa
+function authenticateToken(req, res, next) {
+    const token = req.cookies.token;
+
+    if (token) {
+        try {
+            const decodedToken = jwt.verify(token, 'pass');
+            req.accountId = decodedToken._id; // Lưu id của người dùng vào request để sử dụng trong các route sau
+            req.isLoggedIn = true; // Đánh dấu người dùng đã đăng nhập
+        } catch (error) {
+            console.error(error);
+        }
+    } else {
+        req.isLoggedIn = false; // Đánh dấu người dùng chưa đăng nhập
+    }
+
+    // Tiếp tục middleware dù có token hay không
+    next();
+}
+
+
+router.get('/add/:product', checkLogin, async (req, res) => {
     try {
         var slug = req.params.product;
         var p = await Product.findOne({ slug: slug });
@@ -22,6 +99,17 @@ router.get('/add/:product', async (req, res) => {
             return res.status(404).send("Product not found");
         }
 
+        // Lấy userId từ token trong cookie
+        // const token = req.cookies.token;
+        // const decoded = jwt.verify(token, 'pass');
+        // const userId = decoded._id;
+        // const username = decoded.username;
+
+        // Lấy userId và username từ middleware checkLogin
+        const userId = req.userId;
+        const username = req.username;
+
+
         if (typeof req.session.cart == "undefined") {
             req.session.cart = [];
             req.session.cart.push({
@@ -29,7 +117,9 @@ router.get('/add/:product', async (req, res) => {
                 qty: 1,
                 price: parseFloat(p.price).toFixed(2),
                 image: '/product_images/' + p._id + '/' + p.image,
-                product_id: p._id // Thêm trường product_id với ObjectId của sản phẩm
+                product_id: p._id, // Thêm trường product_id với ObjectId của sản phẩm
+                userId: userId, // Lưu userId vào thông tin giỏ hàng
+                username: username // Lưu username vào thông tin giỏ hàng
             });
         } else {
             var cart = req.session.cart;
@@ -49,11 +139,14 @@ router.get('/add/:product', async (req, res) => {
                     qty: 1,
                     price: parseFloat(p.price).toFixed(2),
                     image: '/product_images/' + p._id + '/' + p.image,
-                    product_id: p._id // Thêm trường product_id với ObjectId của sản phẩm
+                    product_id: p._id, // Thêm trường product_id với ObjectId của sản phẩm
+                    userId: userId, // Lưu userId vào thông tin giỏ hàng
+                    username: username // Lưu username vào thông tin giỏ hàng
                 });
             }
         }
-
+        console.log("User ID:", userId); // In ra userId để kiểm tra
+        console.log("Username:", username); // In ra username để kiểm tra
         req.flash('success', 'Product added!');
         res.redirect('back');
     } catch (err) {
@@ -66,22 +159,43 @@ router.get('/add/:product', async (req, res) => {
 /*
  * GET checkout page
  */
-router.get('/checkout', (req, res) => {
+// router.get('/checkout', (req, res) => {
+//     if (req.session.cart && req.session.cart.length == 0) {
+//         delete req.session.cart;
+//         res.redirect('/cart/checkout');
+//     } else {
+//         res.render('checkout', {
+//             title: 'Checkout',
+//             cart: req.session.cart
+//         });
+//     }
+// });
+
+
+router.get('/checkout', authenticateToken, checkLogin, (req, res) => {
     if (req.session.cart && req.session.cart.length == 0) {
         delete req.session.cart;
         res.redirect('/cart/checkout');
     } else {
+        // Truyền userId vào view bằng cách lấy trực tiếp từ session.cart
+        const userId = req.session.cart && req.session.cart[0] && req.session.cart[0].userId;
+        const username = req.session.cart && req.session.cart[0] && req.session.cart[0].username;
         res.render('checkout', {
             title: 'Checkout',
-            cart: req.session.cart
+            cart: req.session.cart,
+            userId: userId,
+            username: username,
+            isLoggedIn: req.isLoggedIn
         });
+        //console.log(req.session.cart[0]); // Kiểm tra phần tử đầu tiên của session cart
     }
 });
+
 
 /*
  * POST update product
  */
-router.post('/update/:product', (req, res) => {
+router.post('/update/:product', checkLogin, (req, res) => {
     var slug = req.params.product;
     var cart = req.session.cart;
     var action = req.query.action;
@@ -118,7 +232,7 @@ router.post('/update/:product', (req, res) => {
 /*
  * GET clear cart
  */
-router.get('/clear', (req, res) => {
+router.get('/clear', checkLogin, (req, res) => {
 
     delete req.session.cart;
     
@@ -130,14 +244,11 @@ router.get('/clear', (req, res) => {
 /*
  * GET buy now
  */
-router.get('/buynow', (req, res) => {
+router.get('/buynow', checkLogin, (req, res) => {
 
     delete req.session.cart;
     
     res.sendStatus(200);
-    // res.sendStatus(200).render('order_success', {
-    //     layout: 'adminmain'
-    // });
 
 });
     
@@ -145,15 +256,48 @@ router.get('/buynow', (req, res) => {
 /*
  * POST lưu đơn hàng vào cơ sở dữ liệu
  */
-router.post('/checkout2', async (req, res) => {
+// router.post('/checkout2', async (req, res) => {
+//     try {
+//         // Lấy thông tin đơn hàng từ session
+//         const { cart } = req.session;
+
+//         // Tạo một đối tượng Order mới từ thông tin đơn hàng
+//         const newOrder = new Order({
+//             products: cart,
+//             total: calculateTotal(cart) // Hàm calculateTotal phải được định nghĩa
+//         });
+
+//         // Lưu đơn hàng vào cơ sở dữ liệu
+//         const savedOrder = await newOrder.save();
+
+//         // Xóa giỏ hàng khỏi session sau khi đơn hàng đã được lưu
+//         delete req.session.cart;
+
+//         // Phản hồi với thông tin đơn hàng đã được lưu
+//         res.json(savedOrder);
+//     } catch (error) {
+//         console.error('Error saving order:', error);
+//         res.status(500).json({ error: 'Internal server error' });
+//     }
+// });
+
+router.post('/checkout2', checkLogin, async (req, res) => {
     try {
         // Lấy thông tin đơn hàng từ session
         const { cart } = req.session;
 
-        // Tạo một đối tượng Order mới từ thông tin đơn hàng
+        // Lấy userId từ session.cart
+        const userId = cart && cart[0] && cart[0].userId;
+        const username = cart && cart[0] && cart[0].username;
+
+        // Tạo một đối tượng Order mới từ thông tin đơn hàng và userId
         const newOrder = new Order({
             products: cart,
-            total: calculateTotal(cart) // Hàm calculateTotal phải được định nghĩa
+            total: calculateTotal(cart),
+            user: { 
+                userId: userId, // Lưu userId vào thông tin đơn hàng
+                username: username // Lưu username vào thông tin đơn hàng
+            }
         });
 
         // Lưu đơn hàng vào cơ sở dữ liệu
@@ -170,6 +314,7 @@ router.post('/checkout2', async (req, res) => {
     }
 });
 
+
 // Hàm tính tổng giá trị của đơn hàng
 function calculateTotal(cart) {
     let total = 0;
@@ -181,8 +326,8 @@ function calculateTotal(cart) {
 
 
 // Đường dẫn đến trang order_success
-router.get('/order_success', (req, res) => {
-    res.render('order_success', { title: 'Order Success' });
+router.get('/order_success', authenticateToken, checkLogin, (req, res) => {
+    res.render('order_success', { title: 'Order Success', isLoggedIn: req.isLoggedIn });
 });
 
 // Exports
