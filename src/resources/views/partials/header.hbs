@@ -1,101 +1,58 @@
-<nav class="navbar navbar-expand-lg bg-body-tertiary">
-  <div class="container-fluid">
-    
-    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-      <span class="navbar-toggler-icon"></span>
-    </button>
-    <div class="collapse navbar-collapse" id="navbarSupportedContent">
-      <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-        <li class="nav-item">
-          <a class="nav-link active" aria-current="page" href="/">Home</a>
-        </li>
-        <!-- Thêm mục menu cho nút Logout -->
-        <li class="nav-item">
-            <!-- Sử dụng mã nguồn Handlebars để kiểm tra người dùng đã đăng nhập hay chưa -->
-            {{#if loggedIn}}
-                <!-- Hiển thị nút Logout nếu người dùng đã đăng nhập -->
-                <form action="/account/logout" method="GET">
-                    <button type="submit" class="btn btn-link nav-link">Log out</button>
-                </form>
-            {{else}}
-                <!-- Ẩn nút Logout nếu người dùng chưa đăng nhập -->
-                <button type="button" class="btn btn-link nav-link" style="display: none;">Log out</button>
-            {{/if}}
-        </li>
-
-        {{#each pages}}
-          <li class="nav-item">
-            <a class="nav-link" href="/{{slug}}">{{title}}</a>
-          </li>
-        {{/each}}
-
-        <!-- Thêm danh sách các danh mục dưới dạng dropdown -->
-        {{!-- <li class="nav-item">
-          <select class="form-select" aria-label="Category dropdown">
-            <option selected>Choose category</option>
-            {{#each categories}}
-              <option href="/products/{{this.slug}}">{{this.title}}</option>
-            {{/each}}
-          </select>
-        </li> --}}
-
-        <li class="nav-item">
-        <form action="/products/filter" method="GET">
-            <select class="form-select" name="category" aria-label="Category dropdown">
-                <option selected disabled>Choose category</option>
-                {{#each categories}}
-                    <option value="{{this.slug}}">{{this.title}}</option>
-                {{/each}}
-            </select>
-            <button type="submit" class="btn btn-primary">Filter</button>
-        </form>
-        </li>
-
-        <li>
-            <a href="/cart/checkout" id="cart-link">My Cart (
-                {{#if cart}}
-                    <span id="cart-count">{{cart.length}}</span>
-                {{else}}
-                    <span id="cart-count">0</span>
-                {{/if}}
-            )</a>
-        </li>
-
-      </ul>
-    </div>
-  </div>
-</nav>
-{{!-- {{messages 'my_message_template' locals}} --}}
-
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        var addToCartButtons = document.querySelectorAll('.btn-add-product');
-
-        addToCartButtons.forEach(function(button) {
-            button.addEventListener('click', function(event) {
-                var productSlug = button.getAttribute('data-product-slug');
-
-                // Gửi yêu cầu Ajax để thêm sản phẩm vào giỏ hàng
-                var xhr = new XMLHttpRequest();
-                xhr.open('POST', '/add/' + productSlug, true);
-                xhr.setRequestHeader('Content-Type', 'application/json');
-                xhr.onload = function() {
-                    if (xhr.status === 200) {
-                        // Cập nhật số lượng sản phẩm trong thanh navbar
-                        updateCartCount();
-                    } else {
-                        console.log('Request failed. Status: ' + xhr.status);
-                    }
-                };
-                xhr.send();
-            });
-        });
-
-        // Hàm cập nhật số lượng sản phẩm trong thanh navbar
-        function updateCartCount() {
-            var cartCountElement = document.getElementById('#cart-count');
-            var currentCount = parseInt(cartCountElement.innerText);
-            cartCountElement.innerText = currentCount + 1; // Tăng số lượng sản phẩm lên 1 đơn vị
-        }
-    });
-</script>
+<header id="header"><!--header-->
+		
+		<div class="header-middle"><!--header-middle-->
+			<div class="container">
+				<div class="row">
+					<div class="col-sm-4">
+						<div class="logo pull-left">
+							<a href="index.html"><img src="/img/images/home/logo.png" alt="" /></a>
+						</div>
+					</div>
+					<div class="col-sm-8">
+						<div class="shop-menu pull-right">
+							<ul class="nav navbar-nav">
+								<li><a href="/account/account-info"><i class="fa fa-user"></i> Account</a></li>
+								<li><a href="/cart/checkout"><i class="fa fa-shopping-cart"></i> Cart</a></li>
+								{{#if isLoggedIn}}
+                                    <li><a href="/account/logout"><i class="fa fa-sign-out"></i> Logout</a></li>
+                                {{else}}
+                                    <li><a href="/account/login"><i class="fa fa-lock"></i> Login</a></li>
+                                {{/if}}
+							</ul>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div><!--/header-middle-->
+	
+		<div class="header-bottom"><!--header-bottom-->
+			<div class="container">
+				<div class="row">
+					<div class="col-sm-9">
+						<div class="navbar-header">
+							<button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+								<span class="sr-only">Toggle navigation</span>
+								<span class="icon-bar"></span>
+								<span class="icon-bar"></span>
+								<span class="icon-bar"></span>
+							</button>
+						</div>
+						<div class="mainmenu pull-left">
+							<ul class="nav navbar-nav collapse navbar-collapse">
+								{{#each pages}}
+									<li class="active">
+										<a class="active" href="/{{slug}}">{{title}}</a>
+									</li>
+								{{/each}}
+								<li class="dropdown"><a href="#">Shop<i class="fa fa-angle-down"></i></a>
+                                    <ul role="menu" class="sub-menu">
+                                        <li><a href="/products">Products</a></li>
+                                    </ul>
+                                </li>
+							</ul>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div><!--/header-bottom-->
+</header><!--/header-->

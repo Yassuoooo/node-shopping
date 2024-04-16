@@ -25,66 +25,7 @@
 </head><!--/head-->
 
 <body>
-	<header id="header"><!--header-->
-	
-        <div class="header-middle"><!--header-middle-->
-			<div class="container">
-				<div class="row">
-					<div class="col-sm-4">
-						<div class="logo pull-left">
-							<a href="index.html"><img src="/img/images/home/logo.png" alt="" /></a>
-						</div>
-					</div>
-					<div class="col-sm-8">
-						<div class="shop-menu pull-right">
-							<ul class="nav navbar-nav">
-								<li><a href="/account/account-info"><i class="fa fa-user"></i> Account</a></li>
-								{{#if isLoggedIn}}
-                                    <li><a href="/account/logout"><i class="fa fa-sign-out"></i> Logout</a></li>
-                                {{else}}
-                                    <li><a href="/account/login"><i class="fa fa-lock"></i> Login</a></li>
-                                {{/if}}						
-							</ul>
-						</div>
-					</div>
-				</div>
-			</div>
-		</div><!--/header-middle-->
 
-		<div class="header-bottom"><!--header-bottom-->
-			<div class="container">
-				<div class="row">
-					<div class="col-sm-9">
-						<div class="navbar-header">
-							<button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
-								<span class="sr-only">Toggle navigation</span>
-								<span class="icon-bar"></span>
-								<span class="icon-bar"></span>
-								<span class="icon-bar"></span>
-							</button>
-						</div>
-						<div class="mainmenu pull-left">
-							<ul class="nav navbar-nav collapse navbar-collapse">
-								{{#each pages}}
-									<li class="active">
-										<a class="active" href="/{{slug}}">{{title}}</a>
-									</li>
-								{{/each}}
-								<li class="dropdown"><a href="#">Shop<i class="fa fa-angle-down"></i></a>
-                                    <ul role="menu" class="sub-menu">
-                                        <li><a href="shop.html">Products</a></li>
-										<li><a href="cart.html">Cart</a></li> 
-										<li><a href="login.html">Login</a></li> 
-                                    </ul>
-                                </li>
-							</ul>
-						</div>
-					</div>
-				</div>
-			</div>
-		</div><!--/header-bottom-->
-	</header>
-	
 	<section id="advertisement">
 		<div class="container">
 			<img src="/img/images/shop/advertisement.jpg" alt="" />
@@ -102,22 +43,14 @@
                             <div class="panel panel-default">
                                 <div class="panel-heading">
                                     <h4 class="panel-title">
-                                        <a class="category-link" data-toggle="collapse" data-parent="#accordian" href="#{{ this.slug }}" data-category="{{ this.slug }}">
+                                        <a class="category-link" href="/products/category/{{ this.slug }}">
                                             <span class="badge pull-right"><i class="fa fa-plus"></i></span>
                                             {{ this.title }}
                                         </a>
                                     </h4>
-                                </div>
-                                <div id="{{ this.slug }}" class="panel-collapse collapse">
-                                    <div class="panel-body">
-                                        <ul class="product-list" data-category="{{ this.slug }}">
-                                            <!-- Hiển thị danh sách sản phẩm thuộc danh mục này -->
-                                        </ul>
-                                    </div>
-                                </div>
+                                </div>                             
                             </div>
                         {{/each}}
-
                     </div><!--/category-products-->
                 </div>
 
@@ -133,8 +66,8 @@
 							<div class="product-image-wrapper">
 								<div class="single-products">
 									<div class="productinfo text-center">
-                                        <h2 class="title text-center">{{ this.title }}</h2>
-                                        <a class="pa" href="/products/{{this.category}}/{{this.slug}}">
+                                        <h2 class="title text-center" href="/products/{{this.slug}}">{{ this.title }}</h2>
+                                        <a class="pa" href="/products/{{this.slug}}">
 										    <img class="img-pd" src="/product_images/{{ this._id }}/{{ this.image }}" alt="{{ this.title }}" />
                                         </a>
 										<h2>${{ formatCurrency this.price }}</h2>
@@ -159,50 +92,6 @@
 		</div>
 	</section>
 	
-	<footer id="footer"><!--Footer-->
-		
-		<div class="footer-widget">
-			<div class="container">
-				<div class="row">
-					<div class="col-sm-2">
-						<div class="single-widget">
-							<h2>Service</h2>
-							
-						</div>
-					</div>
-					<div class="col-sm-2">
-						<div class="single-widget">
-							<h2>Quock Shop</h2>
-							
-						</div>
-					</div>
-					<div class="col-sm-2">
-						<div class="single-widget">
-							<h2>Policies</h2>
-							
-						</div>
-					</div>
-					<div class="col-sm-2">
-						<div class="single-widget">
-							<h2>About Shopper</h2>
-							
-						</div>
-					</div>
-					
-				</div>
-			</div>
-		</div>
-		
-		<div class="footer-bottom">
-			<div class="container">
-				<div class="row">
-					<p class="pull-left">Copyright © 2013 E-SHOPPER Inc. All rights reserved.</p>
-					<p class="pull-right">Designed by <span><a target="_blank" href="http://www.themeum.com">Themeum</a></span></p>
-				</div>
-			</div>
-		</div>
-		
-	</footer><!--/Footer-->
 	
     <script src="/js/jquery.js"></script>
 	<script src="/js/price-range.js"></script>
@@ -213,85 +102,6 @@
 </body>
 
 <script>
-function addToCart(slug) {
-    fetch(`/cart/add/${slug}`, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        }
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            console.log(data.message);
-            updateCartCount(); // Cập nhật số lượng sản phẩm trong giỏ hàng trên navbar
-        } else {
-            console.error(data.message);
-        }
-    })
-    .catch(error => {
-        console.error('Error adding product to cart:', error);
-    });
-}
-
-function updateCartCount() {
-    fetch('/cart/count', {
-        method: 'GET',
-        headers: {
-            'Content-Type': 'application/json'
-        }
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            const cartCountElement = document.getElementById('cart-count');
-            if (cartCountElement) {
-                cartCountElement.textContent = data.count;
-            }
-        } else {
-            console.error(data.message);
-        }
-    })
-    .catch(error => {
-        console.error('Error updating cart count:', error);
-    });
-}
-
-
-
-$(document).ready(function(){
-    // Bắt sự kiện click trên tên danh mục
-    $('.category-link').click(function(e){
-        e.preventDefault(); // Ngăn chặn hành vi mặc định của liên kết
-
-        // Lấy slug của danh mục từ thuộc tính data-category
-        var categorySlug = $(this).data('category');
-
-        // Gửi yêu cầu AJAX để lấy danh sách sản phẩm theo danh mục
-        fetch('/product/filter/' + categorySlug)
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('Network response was not ok');
-                }
-                return response.json();
-            })
-            .then(data => {
-                // Cập nhật phần hiển thị sản phẩm với dữ liệu mới
-                var productList = $('[data-category="' + categorySlug + '"]'); // Chọn phần tử có data-category tương ứng
-                productList.empty(); // Xóa nội dung cũ
-                data.forEach(function(title) {
-                    productList.append('<li>' + title + '</li>');
-                });
-                // Mở phần collapse sau khi cập nhật dữ liệu
-                $('#' + categorySlug).collapse('show');
-            })
-            .catch(error => {
-                console.error('Error fetching products:', error);
-            });
-    });
-});
-
-
 
 </script>
 

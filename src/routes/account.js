@@ -5,6 +5,11 @@ const jwt = require('jsonwebtoken');
 const cookieParser = require('cookie-parser');
 
 
+router.get('/notpermitted', (req, res) => {
+    res.render('notpermitted', { title: 'notpermitted', layout: 'main'});
+})
+
+
 router.get('/login_required', (req, res) => {
     res.render('account/login_required', { title: 'login required', layout: 'accountmain' });
 })
@@ -117,7 +122,7 @@ router.get('/account-info', async (req, res) => {
             email: account.email,
             role: account.role,
             isLoggedIn: true, // Truyền trạng thái đăng nhập
-            layout: 'accountmain'
+            layout: 'main'
         });
     } catch (error) {
         console.error(error);

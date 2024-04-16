@@ -83,72 +83,41 @@ router.get('/', authenticateToken, (req, res) => {
 });
 
 
-
-
 /*
  * GET products by category
  */
-// router.get('/filter', (req, res) => {
-//     const categoryId = req.query.category;
 
-//     Category.findOne({ slug: categoryId })
-//         .then(category => {
-//             if (!category) {
-//                 console.log("Danh mục không tồn tại.");
-//                 res.status(404).send("Danh mục không tồn tại.");
-//             } else {
-//                 Product.find({ category: categoryId })
-//                     .then(products => {
-//                         // Convert mongoose objects to regular JavaScript objects
-//                         const productsObject = products.map(product => mongooseToObject(product));
-                        
-//                         res.render('product_cate', {
-//                             title: category.title,
-//                             products: productsObject, // Use the converted products array
-//                             layout: 'main'
-//                         });
-//                     })
-//                     .catch(err => {
-//                         console.error(err);
-//                         res.status(500).send("Lỗi máy chủ nội bộ.");
-//                     });
-//             }
-//         })
-//         .catch(err => {
-//             console.error(err);
-//             res.status(500).send("Lỗi máy chủ nội bộ.");
-//         });
-// });
-
-router.get('/filter', (req, res) => {
-    const categorySlug = req.query.category; // Sử dụng req.query thay vì req.params
-    console.log(categorySlug);
-    // Tìm danh mục có slug tương ứng
+router.get('/category/:slug', authenticateToken, (req, res) => {
+    const categorySlug = req.params.slug;
+    //console.log(categorySlug);
+    // Tìm danh mục theo slug
     Category.findOne({ slug: categorySlug })
         .then(category => {
             if (!category) {
-                // Nếu không tìm thấy danh mục, trả về lỗi 404
-                console.log("Danh mục không tồn tại.");
-                return res.status(404).send("Danh mục không tồn tại.");
-            } else {
-                // Tìm các sản phẩm có category tương ứng với slug của danh mục
-                Product.find({ category: categorySlug })
-                    .then(products => {
-                        // Lấy danh sách các title của sản phẩm
-                        const productTitles = products.map(product => product.title);
-                        console.log(productTitles);
-                        // Trả về danh sách các title sản phẩm đã lọc
-                        res.send(productTitles);
-                    })
-                    .catch(err => {
-                        console.error(err);
-                        res.status(500).send("Lỗi máy chủ nội bộ.");
-                    });
+                return res.status(404).send('Category not found');
             }
+
+            // Tìm sản phẩm theo category tương ứng
+            Product.find({ category: category.slug }) // Sử dụng slug của danh mục
+                .then(products => {
+                    // Chuyển đổi dữ liệu sản phẩm từ MongoDB sang đối tượng JavaScript
+                    const productsObject = products.map(product => mongooseToObject(product));
+                    //console.log(productsObject);
+                    res.render('product', {
+                        title: category.title,
+                        products: productsObject,
+                        isLoggedIn: req.isLoggedIn,
+                        layout: 'main'
+                    });
+                })
+                .catch(err => {
+                    console.error(err);
+                    res.status(500).send("Internal Server Error");
+                });
         })
         .catch(err => {
             console.error(err);
-            res.status(500).send("Lỗi máy chủ nội bộ.");
+            res.status(500).send("Internal Server Error");
         });
 });
 
@@ -156,7 +125,7 @@ router.get('/filter', (req, res) => {
 /*
  * GET product details
  */
-router.get('/:category/:product', authenticateToken, (req, res) => {
+router.get('/:product', authenticateToken, (req, res) => {
 
     Product.findOne({ slug: req.params.product })
         .then(product => {
@@ -175,7 +144,7 @@ router.get('/:category/:product', authenticateToken, (req, res) => {
                         //console.log(galleryImages);
                         // Chuyển đổi product thành object JavaScript
                         const productObject = mongooseToObject(product);
-
+                        //console.log(productObject);
                         res.render('product_details', {
                             title: productObject.title,
                             p: productObject,

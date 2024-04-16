@@ -1,0 +1,101 @@
+<nav class="navbar navbar-expand-lg bg-body-tertiary">
+  <div class="container-fluid">
+    
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+        <li class="nav-item">
+          <a class="nav-link active" aria-current="page" href="/">Home</a>
+        </li>
+        <!-- Thêm mục menu cho nút Logout -->
+        <li class="nav-item">
+            <!-- Sử dụng mã nguồn Handlebars để kiểm tra người dùng đã đăng nhập hay chưa -->
+            {{#if loggedIn}}
+                <!-- Hiển thị nút Logout nếu người dùng đã đăng nhập -->
+                <form action="/account/logout" method="GET">
+                    <button type="submit" class="btn btn-link nav-link">Log out</button>
+                </form>
+            {{else}}
+                <!-- Ẩn nút Logout nếu người dùng chưa đăng nhập -->
+                <button type="button" class="btn btn-link nav-link" style="display: none;">Log out</button>
+            {{/if}}
+        </li>
+
+        {{#each pages}}
+          <li class="nav-item">
+            <a class="nav-link" href="/{{slug}}">{{title}}</a>
+          </li>
+        {{/each}}
+
+        <!-- Thêm danh sách các danh mục dưới dạng dropdown -->
+        {{!-- <li class="nav-item">
+          <select class="form-select" aria-label="Category dropdown">
+            <option selected>Choose category</option>
+            {{#each categories}}
+              <option href="/products/{{this.slug}}">{{this.title}}</option>
+            {{/each}}
+          </select>
+        </li> --}}
+
+        <li class="nav-item">
+        <form action="/products/filter" method="GET">
+            <select class="form-select" name="category" aria-label="Category dropdown">
+                <option selected disabled>Choose category</option>
+                {{#each categories}}
+                    <option value="{{this.slug}}">{{this.title}}</option>
+                {{/each}}
+            </select>
+            <button type="submit" class="btn btn-primary">Filter</button>
+        </form>
+        </li>
+
+        <li>
+            <a href="/cart/checkout" id="cart-link">My Cart (
+                {{#if cart}}
+                    <span id="cart-count">{{cart.length}}</span>
+                {{else}}
+                    <span id="cart-count">0</span>
+                {{/if}}
+            )</a>
+        </li>
+
+      </ul>
+    </div>
+  </div>
+</nav>
+{{!-- {{messages 'my_message_template' locals}} --}}
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        var addToCartButtons = document.querySelectorAll('.btn-add-product');
+
+        addToCartButtons.forEach(function(button) {
+            button.addEventListener('click', function(event) {
+                var productSlug = button.getAttribute('data-product-slug');
+
+                // Gửi yêu cầu Ajax để thêm sản phẩm vào giỏ hàng
+                var xhr = new XMLHttpRequest();
+                xhr.open('POST', '/add/' + productSlug, true);
+                xhr.setRequestHeader('Content-Type', 'application/json');
+                xhr.onload = function() {
+                    if (xhr.status === 200) {
+                        // Cập nhật số lượng sản phẩm trong thanh navbar
+                        updateCartCount();
+                    } else {
+                        console.log('Request failed. Status: ' + xhr.status);
+                    }
+                };
+                xhr.send();
+            });
+        });
+
+        // Hàm cập nhật số lượng sản phẩm trong thanh navbar
+        function updateCartCount() {
+            var cartCountElement = document.getElementById('#cart-count');
+            var currentCount = parseInt(cartCountElement.innerText);
+            cartCountElement.innerText = currentCount + 1; // Tăng số lượng sản phẩm lên 1 đơn vị
+        }
+    });
+</script>

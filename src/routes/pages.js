@@ -8,27 +8,6 @@ var Product = require('../app/models/product');
 var Category = require('../app/models/category');
 var Page = require('../app/models/page');
 
-// GET trang chủ
-// router.get('/', (req, res) => {
-//     Page.findOne({ slug: 'home' })
-//         .then(page => {
-//             if (!page) {
-//                 //console.log("Trang không tồn tại.");
-//                 res.status(404).send("Trang không tồn tại.");
-//             } else {
-//                 res.render('home', {
-//                     title: page.title,
-//                     content: page.content,
-//                     products: products,
-//                     layout: 'main'
-//                 });
-//             }
-//         })
-//         .catch(err => {
-//             console.error(err);
-//             res.status(500).send("Lỗi máy chủ nội bộ.");
-//         });
-// });
 
 // Middleware để kiểm tra token và xác minh người dùng đã đăng nhập hay chưa
 function authenticateToken(req, res, next) {
@@ -49,7 +28,6 @@ function authenticateToken(req, res, next) {
     // Tiếp tục middleware dù có token hay không
     next();
 }
-
 
 
 router.get('/home', authenticateToken, async (req, res) => {
@@ -90,28 +68,45 @@ router.get('/home', authenticateToken, async (req, res) => {
     }
 });
 
-// GET một trang bất kỳ dựa trên slug
-// router.get('/:slug', (req, res) => {
-//     const slug = req.params.slug;
+/*
+ * GET products by category
+ */
 
-//     Page.findOne({ slug: slug })
-//         .then(page => {
-//             if (!page) {
-//                 console.log("Trang không tồn tại.");
-//                 res.status(404).send("Trang không tồn tại.");
-//             } else {
-//                 res.render('home', {
-//                     title: page.title,
-//                     content: page.content,
-//                     layout: 'main'
-//                 });
-//             }
-//         })
-//         .catch(err => {
-//             console.error(err);
-//             res.status(500).send("Lỗi máy chủ nội bộ.");
-//         });
-// });
+router.get('/category/:slug', authenticateToken, (req, res) => {
+    const categorySlug = req.params.slug;
+    //console.log(categorySlug);
+    // Tìm danh mục theo slug
+    Category.findOne({ slug: categorySlug })
+        .then(category => {
+            if (!category) {
+                return res.status(404).send('Category not found');
+            }
+
+            // Tìm sản phẩm theo category tương ứng
+            Product.find({ category: category.slug }) // Sử dụng slug của danh mục
+                .then(products => {
+                    // Chuyển đổi dữ liệu sản phẩm từ MongoDB sang đối tượng JavaScript
+                    const productsObject = products.map(product => mongooseToObject(product));
+                    //console.log(productsObject);
+                    res.render('home', {
+                        title: category.title,
+                        products: productsObject,
+                        isLoggedIn: req.isLoggedIn,
+                        layout: 'main'
+                    });
+                })
+                .catch(err => {
+                    console.error(err);
+                    res.status(500).send("Internal Server Error");
+                });
+        })
+        .catch(err => {
+            console.error(err);
+            res.status(500).send("Internal Server Error");
+        });
+});
+
+
 
 router.get('/contact-us', authenticateToken, async (req, res) => {
     try {     

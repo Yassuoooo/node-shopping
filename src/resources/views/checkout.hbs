@@ -25,65 +25,7 @@
 </head><!--/head-->
 
 <body>
-	<header id="header"><!--header-->
-		
-		<div class="header-middle"><!--header-middle-->
-			<div class="container">
-				<div class="row">
-					<div class="col-sm-4">
-						<div class="logo pull-left">
-							<a href="index.html"><img src="/img/images/home/logo.png" alt="" /></a>
-						</div>
-					</div>
-					<div class="col-sm-8">
-						<div class="shop-menu pull-right">
-							<ul class="nav navbar-nav">
-								<li><a href="/account/account-info"><i class="fa fa-user"></i> Account</a></li>
-								{{#if isLoggedIn}}
-                                    <li><a href="/account/logout"><i class="fa fa-sign-out"></i> Logout</a></li>
-                                {{else}}
-                                    <li><a href="/account/login"><i class="fa fa-lock"></i> Login</a></li>
-                                {{/if}}						
-							</ul>
-						</div>
-					</div>
-				</div>
-			</div>
-		</div><!--/header-middle-->
-	
-		<div class="header-bottom"><!--header-bottom-->
-			<div class="container">
-				<div class="row">
-					<div class="col-sm-9">
-						<div class="navbar-header">
-							<button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
-								<span class="sr-only">Toggle navigation</span>
-								<span class="icon-bar"></span>
-								<span class="icon-bar"></span>
-								<span class="icon-bar"></span>
-							</button>
-						</div>
-						<div class="mainmenu pull-left">
-							<ul class="nav navbar-nav collapse navbar-collapse">
-								{{#each pages}}
-									<li class="active">
-										<a class="active" href="/{{slug}}">{{title}}</a>
-									</li>
-								{{/each}}
-								<li class="dropdown"><a href="#">Shop<i class="fa fa-angle-down"></i></a>
-                                    <ul role="menu" class="sub-menu">
-                                        <li><a href="shop.html">Products</a></li>
-										<li><a href="cart.html">Cart</a></li> 
-										<li><a href="login.html">Login</a></li> 
-                                    </ul>
-                                </li>
-							</ul>
-						</div>
-					</div>
-				</div>
-			</div>
-		</div><!--/header-bottom-->
-	</header><!--/header-->
+
 {{#if cart}}
 	<section id="cart_items">
 		<div class="container">
@@ -153,53 +95,6 @@
     <h3 class="text-center">Your cart is empty.</h3>
 {{/if}}
 	
-
-	<footer id="footer"><!--Footer-->
-		
-		<div class="footer-widget">
-			<div class="container">
-				<div class="row">
-					<div class="col-sm-2">
-						<div class="single-widget">
-							<h2>Service</h2>
-							
-						</div>
-					</div>
-					<div class="col-sm-2">
-						<div class="single-widget">
-							<h2>Quock Shop</h2>
-							
-						</div>
-					</div>
-					<div class="col-sm-2">
-						<div class="single-widget">
-							<h2>Policies</h2>
-							
-						</div>
-					</div>
-					<div class="col-sm-2">
-						<div class="single-widget">
-							<h2>About Shopper</h2>
-							
-						</div>
-					</div>
-					
-				</div>
-			</div>
-		</div>
-		
-		<div class="footer-bottom">
-			<div class="container">
-				<div class="row">
-					<p class="pull-left">Copyright © 2013 E-SHOPPER Inc. All rights reserved.</p>
-					<p class="pull-right">Designed by <span><a target="_blank" href="http://www.themeum.com">Themeum</a></span></p>
-				</div>
-			</div>
-		</div>
-		
-	</footer><!--/Footer-->
-	
-
 
     <script src="/js/jquery.js"></script>
 	<script src="/js/bootstrap.min.js"></script>
