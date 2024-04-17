@@ -65,7 +65,7 @@ router.get('/', authenticateToken, checkLogin, checkAdminProduct, (req, res) => 
         })
         .then((products) => {
             const productsArray = products.map(product => mongooseToObject(product));
-            res.render('admin/products', {
+            res.render('admin/products2', {
                 products: productsArray,
                 count: count,
                 isLoggedIn: req.isLoggedIn,
@@ -89,7 +89,7 @@ router.get('/add-product', authenticateToken, checkLogin, checkAdminProduct, (re
     Category.find()
         .then(categories => {
             const categoriesObject = categories.map(category => mongooseToObject(category));
-            res.render('admin/add_product', {
+            res.render('admin/add_product2', {
                 title: title,
                 desc: desc,
                 categories: categoriesObject,
@@ -238,44 +238,6 @@ router.post('/add-product', [
 /*
  * GET edit product
  */
-// router.get('/edit-product/:id', (req, res) => {
-//     let errors;
-
-//     if (req.session.errors) {
-//         errors = req.session.errors;
-//     }
-//     req.session.errors = null;
-
-//     Category.find()
-//         .then(categories => {
-//             Product.findById(req.params.id)
-//                 .then(p => {
-//                     if (!p) {
-//                         return res.redirect('/admin/products');
-//                     }
-
-//                     res.render('admin/edit_product', {
-//                         title: p.title,
-//                         errors: errors,
-//                         desc: p.desc,
-//                         categories: mongooseToObject(categories), // Chuyển đổi categories sang JavaScript Object
-//                         category: p.category.replace(/\s+/g, '-').toLowerCase(),
-//                         price: parseFloat(p.price).toFixed(2),
-//                         image: p.image,
-//                         id: p._id
-//                     });
-//                 })
-//                 .catch(err => {
-//                     console.error(err);
-//                     res.status(500).send('Internal Server Error');
-//                 });
-//         })
-//         .catch(err => {
-//             console.error(err);
-//             res.status(500).send('Internal Server Error');
-//         });
-// });
-
 
 router.get('/edit-product/:id', authenticateToken, checkLogin, checkAdminProduct, (req, res) => {
     Product.findById(req.params.id)
@@ -290,7 +252,7 @@ router.get('/edit-product/:id', authenticateToken, checkLogin, checkAdminProduct
                     // bằng cách sử dụng hàm mongooseToObject
                     const categoriesObject = categories.map(category => mongooseToObject(category));
                     
-                    res.render('admin/edit_product', {
+                    res.render('admin/edit_product2', {
                         title: product.title,
                         errors: null, // Không cần xử lý lỗi ở đây
                         desc: product.desc,
@@ -385,11 +347,11 @@ router.put('/edit-product/:id', checkLogin, checkAdminProduct, (req, res) => {
             product.category = category;
 
             let imageFile = ''; // Khởi tạo biến imageFile
-            console.log(req.files);
+            //console.log(req.files);
             if (req.files && req.files.image) {
                 imageFile = req.files.image.name;
                 product.image = imageFile;
-                console.log(product.image);
+                //console.log(product.image);
                 // Tạo đường dẫn tuyệt đối cho thư mục sản phẩm
                 const productDir = path.join(__dirname, '../public/product_images', id.toString());
 

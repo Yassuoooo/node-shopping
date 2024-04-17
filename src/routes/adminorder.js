@@ -57,7 +57,7 @@ router.get('/', authenticateToken, checkLogin, checkAdminOrderProduct, async (re
             username: order.user[0].username,
             total: order.total
         }));
-        res.render('admin/orders', { title: 'Admin Orders', orders: ordersObject, isLoggedIn: req.isLoggedIn, layout: 'adminmain' });
+        res.render('admin/orders2', { title: 'Admin Orders', orders: ordersObject, isLoggedIn: req.isLoggedIn, layout: 'adminmain' });
     } catch (error) {
         console.error('Error fetching orders:', error);
         res.status(500).json({ error: 'Internal server error' });
@@ -74,7 +74,7 @@ router.get('/:orderId', authenticateToken, checkLogin, checkAdminOrderProduct, a
         const orderId = req.params.orderId;
         const order = await Order.findById(orderId).populate('user.userId');
         const orderObject = mongooseToObject(order);
-        res.render('admin/orderdetails', { title: 'Order Detail', order: orderObject, isLoggedIn: req.isLoggedIn, layout: 'adminmain' });
+        res.render('admin/orderdetails2', { title: 'Order Detail', order: orderObject, isLoggedIn: req.isLoggedIn, layout: 'adminmain' });
     } catch (error) {
         console.error('Error fetching order:', error);
         res.status(500).json({ error: 'Internal server error' });

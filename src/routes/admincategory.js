@@ -59,7 +59,7 @@ router.get('/', authenticateToken, checkLogin, checkAdminCategory, (req, res) =>
             const categoriesObject = categories.map(category => mongooseToObject(category));
             
             // Render the handlebars template with the converted categories
-            res.render('admin/categories', {
+            res.render('admin/categories2', {
                 categories: categoriesObject,
                 isLoggedIn: req.isLoggedIn,
                 layout: 'adminmain'
@@ -79,7 +79,7 @@ router.get('/add-category', authenticateToken, checkLogin, checkAdminCategory, (
 
     var title = "";
 
-    res.render('admin/add_category', {
+    res.render('admin/add_category2', {
         title: title,
         isLoggedIn: req.isLoggedIn,
         layout: 'adminmain'
@@ -135,7 +135,7 @@ router.post('/add-category', [
 
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-        return res.render('admin/add_category', {
+        return res.render('admin/add_category2', {
             errors: errors.array(),
             title: req.body.title,         
             layout: 'adminmain'
@@ -174,7 +174,7 @@ router.get('/edit-category/:id', authenticateToken, checkLogin, checkAdminCatego
             if (!category) {
                 return res.status(404).send('Category not found');
             }
-            res.render('admin/edit_category', {
+            res.render('admin/edit_category2', {
                 title: category.title,
                 id: category._id,
                 isLoggedIn: req.isLoggedIn,
@@ -202,7 +202,7 @@ router.put('/p-editcategory/:id', [
     const errors = validationResult(req);
 
     if (!errors.isEmpty()) {
-        return res.render('admin/edit_category', {
+        return res.render('admin/edit_category2', {
             errors: errors.array(),
             title: req.body.title,
             slug: title.replace(/\s+/g, '-').toLowerCase(),
@@ -242,7 +242,7 @@ router.put('/edit-category/:id', [
     const errors = validationResult(req);
 
     if (!errors.isEmpty()) {
-        return res.render('admin/edit_category', {
+        return res.render('admin/edit_category2', {
             errors: errors.array(),
             title: req.body.title,
             slug: title.replace(/\s+/g, '-').toLowerCase(),

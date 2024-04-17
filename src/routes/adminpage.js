@@ -63,7 +63,7 @@ router.get('/', authenticateToken, checkLogin, checkAdminPage, (req, res) => {
         const pagesObject = pages.map(page => mongooseToObject(page));
         
         // Render the handlebars template with the converted pages
-        res.render('admin/pages', {
+        res.render('admin/pages2', {
             pages: pagesObject,
             isLoggedIn: req.isLoggedIn,
             layout: 'adminmain'
@@ -86,7 +86,7 @@ router.get('/add-page', authenticateToken, checkLogin, checkAdminPage, (req, res
     var slug = "";
     var content = "";
 
-    res.render('admin/add_page', {
+    res.render('admin/add_page2', {
         title: title,
         slug: slug,
         content: content,
@@ -196,7 +196,7 @@ router.get('/edit-page/:id', authenticateToken, checkLogin, checkAdminPage, (req
                 // Trả về lỗi 404 nếu không tìm thấy page
                 return res.status(404).send('Page not found');
             }
-            res.render('admin/edit_page', {
+            res.render('admin/edit_page2', {
                 title: page.title,
                 slug: page.slug,
                 content: page.content,

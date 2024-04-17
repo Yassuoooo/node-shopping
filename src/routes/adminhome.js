@@ -28,7 +28,7 @@ function authenticateToken(req, res, next) {
 }
 
 router.get('/', authenticateToken, checkLogin, checkAdminHome, (req, res) => {  
-    res.render('admin/adminhome', {
+    res.render('admin/adminhome2', {
         isLoggedIn: req.isLoggedIn,
         layout: 'adminmain'
     });

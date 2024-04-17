@@ -2,10 +2,6 @@
 <a href="/adminpage" class="btn btn-primary">Back to all pages</a>
 <br><br>
 
-    {{!-- dùng _method tạo ở index.js để overdrive method post thành put để sửa course --}}
-{{!-- <form method="POST" action="/adminpage/edit-page/{{ id }}" enctype="application/x-www-form-urlencoded"> --}}
-    <!-- Thêm trường ẩn để gửi phương thức PUT -->
-    {{!-- <input type="hidden" name="_method" value="PUT"> --}}
 <form method="POST" action="/adminpage/edit-page/{{id}}?_method=PUT">
 
     <div class="form-group">
