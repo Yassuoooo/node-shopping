@@ -55,34 +55,29 @@ app.use((req, res, next) => {
         });
 });
 
-// Sử dụng template adminheader
-app.get('/adminheader', (req, res) => {
-    res.render('adminheader', {
-        layout: 'adminmain'
-    });
-});
+// app.get('/adminheader', (req, res) => {
+//     res.render('adminheader', {
+//         layout: 'adminmain'
+//     });
+// });
 
-app.get('/header', (req, res) => {
-    res.render('header', {
-        layout: 'main'
-    });
-});
+// app.get('/header', (req, res) => {
+//     res.render('header', {
+//         layout: 'main'
+//     });
+// });
 
 
 const Category = require('./app/models/category');
-// Middleware để lấy tất cả các danh mục và thêm chúng vào context
 app.use((req, res, next) => {
     Category.find({}).exec()
         .then(categories => {
-            // Nếu có các trang được tìm thấy, chuyển đổi chúng thành các đối tượng JavaScript thông thường
+            
             const categoriesObject = categories.map(category => mongooseToObject(category));
-            // Thêm pages vào context
             res.locals.categories = categoriesObject;
-            // Chuyển sang middleware tiếp theo
             next();
         })
         .catch(err => {
-            // Nếu có lỗi, gửi mã lỗi 500 Internal Server Error
             console.error(err);
             res.status(500).json({ error: 'Internal Server Error' });
         });
@@ -223,14 +218,14 @@ const CryptoJS = require('crypto-js');
 // Tạo một chuỗi ngẫu nhiên có độ dài 32 ký tự
 const secretKey = CryptoJS.lib.WordArray.random(32).toString(CryptoJS.enc.Hex);
 
-console.log(secretKey);
+//console.log(secretKey);
 
 
 // Cấu hình express-session
 app.use(session({
     secret: secretKey, // Chuỗi bí mật để ký và mã hóa cookie session
-    resave: true, // Không lưu lại phiên mỗi lần yêu cầu
-    saveUninitialized: true // Không lưu phiên cho các yêu cầu không được khởi tạo
+    resave: false, // Không lưu lại phiên mỗi lần yêu cầu
+    saveUninitialized: false // Không lưu phiên cho các yêu cầu không được khởi tạo
 }));
 
 

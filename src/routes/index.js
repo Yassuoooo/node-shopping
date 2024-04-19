@@ -6,6 +6,7 @@ const pageAdminRouter = require('./adminpage');
 const categoryAdminRouter = require('./admincategory');
 const productAdminRouter = require('./adminproduct');
 const orderAdminRouter = require('./adminorder');
+const orderAdminUsers = require('./adminusers');
 const pagesRouter = require('./pages');
 const productRouter = require('./product');
 const cartRouter = require('./cart');
@@ -26,6 +27,8 @@ function route(app) {
     app.use('/adminproduct', productAdminRouter);
 
     app.use('/adminorder', orderAdminRouter);
+
+    app.use('/adminusers', orderAdminUsers);
     
     app.use('/products', productRouter);
 

@@ -69,6 +69,25 @@ router.get('/', authenticateToken, checkLogin, checkAdminOrderProduct, async (re
 /*
  * GET trang chi tiết đơn hàng
  */
+
+// postman:
+router.get('/p-orders/:orderId', async (req, res) => {
+    try {
+        const orderId = req.params.orderId;
+        const order = await Order.findById(orderId).populate('user.userId');
+        if (!order) {
+            return res.status(404).json({ error: 'Order not found' });
+        }
+        res.status(200).json(order);
+    } catch (error) {
+        console.error('Error fetching order:', error);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+});
+
+
+
+// client:
 router.get('/:orderId', authenticateToken, checkLogin, checkAdminOrderProduct, async (req, res) => {
     try {
         const orderId = req.params.orderId;

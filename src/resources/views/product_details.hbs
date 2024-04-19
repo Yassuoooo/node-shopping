@@ -35,7 +35,7 @@
 																	
 						
 						<div class="shipping text-center"><!--shipping-->
-							<img src="/img/images/home/shipping.jpg" alt="" />
+							<img src="/img/poster1.png" alt="" />
 						</div><!--/shipping-->
 						
 					</div>
@@ -51,7 +51,7 @@
                                 </span>
                                 <h2>Description: {{p.desc}} </h2>                                      
                                 <span>
-                                    <span>Price: ${{p.price}}</span> <!-- Sử dụng thuộc tính price của sản phẩm -->     
+                                    <span>Price: {{p.price}}đ</span> <!-- Sử dụng thuộc tính price của sản phẩm -->     
                                 </span>
                                 <form action="/cart/add/{{ p.slug }}" method="get">
                                     <button type="submit" class="btn btn-default cart add-to-cart">

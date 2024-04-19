@@ -123,8 +123,7 @@
                 }
             })
             .then(data=> {
-                //console.log(data);
-                setCookie('token', data.token, 1);
+                window.location.href = '/account/login';
             })
             .catch(err => {
                 console.log(err);

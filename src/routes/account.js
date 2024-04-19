@@ -6,7 +6,7 @@ const cookieParser = require('cookie-parser');
 
 
 router.get('/notpermitted', (req, res) => {
-    res.render('notpermitted', { title: 'notpermitted', layout: 'main'});
+    res.render('notpermitted', { title: 'notpermitted', isLoggedIn: true, layout: 'main'});
 })
 
 
@@ -63,6 +63,7 @@ router.get('/register', (req, res) => {
     res.render('account/register', { title: 'Register', layout: 'accountmain' });
 })
 
+// postman:
 router.post('/register', (req, res) => {
     const { username, password, email } = req.body;
 
@@ -78,11 +79,37 @@ router.post('/register', (req, res) => {
                 // Lưu tài khoản vào cơ sở dữ liệu
                 newAccount.save()
                     .then(savedAccount => {
-                        // Tạo token cho tài khoản mới đăng ký
-                        const token = jwt.sign({ _id: savedAccount._id }, 'pass');
+                        return res.status(201).json('registrationSuccess');
+                    })
+                    .catch(err => {
+                        console.error(err);
+                        return res.status(500).json({ message: 'Server error' });
+                    });
+            }
+        })
+        .catch(err => {
+            console.error(err);
+            return res.status(500).json({ message: 'Server error' });
+        });
+});
 
-                        // Trả về thông điệp và token cho client
-                        return res.json({ message: 'Registration successful', token });
+// client:
+router.post('/register', (req, res) => {
+    const { username, password, email } = req.body;
+
+    // Kiểm tra xem tài khoản đã tồn tại chưa
+    AccountModel.findOne({ username })
+        .then(existingAccount => {
+            if (existingAccount) {
+                return res.status(400).json({ message: 'Username already exists' });
+            } else {
+                // Tạo một tài khoản mới
+                const newAccount = new AccountModel({ username, password, email });
+
+                // Lưu tài khoản vào cơ sở dữ liệu
+                newAccount.save()
+                    .then(savedAccount => {
+                        return res.status(201).redirect('/account/login');
                     })
                     .catch(err => {
                         console.error(err);
@@ -129,6 +156,7 @@ router.get('/account-info', async (req, res) => {
         res.status(500).render('error', { message: 'Server error' });
     }
 });
+
 
 router.get('/logout', (req, res) => {
     // Xóa cookie token

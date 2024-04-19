@@ -53,7 +53,7 @@
 						{{#each cart}}
 						<tr>			
 							<td class="cart_product">
-								<a href=""><img src="{{ image }}" alt=""></a>
+								<a href=""><img class="cart_img" src="{{ image }}" alt=""></a>
 							</td>
 							<td class="cart_description">
 								<h4><a href="">{{ title }}</a></h4>
@@ -89,7 +89,7 @@
 
     <!-- Nút Clear Cart -->
     <div class="text-center">
-        <button class="btn btn-danger clearcart" href="/cart/clear">Clear Cart</button>
+        <button class="clearcart btn btn-danger" onclick="clearCart()">Clear Cart</button>
     </div>
 {{else}}
     <h3 class="text-center">Your cart is empty.</h3>
@@ -207,6 +207,32 @@ document.addEventListener('DOMContentLoaded', function () {
 
 });
 </script>
+
+<script>
+    function clearCart() {
+        fetch('/cart/clear', {
+            method: 'GET',
+            credentials: 'same-origin' // Đảm bảo cookie được gửi đi trong yêu cầu
+        })
+        .then(response => {
+            if (response.ok) {
+                // Xử lý khi xóa giỏ hàng thành công
+                alert('Cart cleared!');
+                window.location.reload();
+                //window.location.href = '/cart/checkout';
+                // Cập nhật giao diện hoặc thực hiện các thao tác khác ở đây
+            } else {
+                // Xử lý khi có lỗi xảy ra
+                alert('Error clearing cart!');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Error clearing cart!');
+        });
+    }
+</script>
+
     
 </body>
 </html>

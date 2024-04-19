@@ -124,7 +124,7 @@
             <li class="nav-item active">
                 <a class="nav-link" href="orders.html">
                     <i class="fas fa-fw fa-list-alt"></i>
-                    <span>Orders</span></a>
+                    <span>Users</span></a>
             </li>
 
             <!-- Nav Item - Tables -->
@@ -345,92 +345,50 @@
                 <div class="container-fluid">
 
                     <!-- Content Row -->
-                    {{!-- <div class="row">
+                    <div class="row">
 
                         <div class="col-xl-8 col-lg-7">
 
+                            <!-- Order List -->
+
                             <div class="card shadow mb-4">
-                                <div class="card-header py-3">
-                                    <h6 class="m-0 font-weight-bold text-primary">Order List</h6>
-                                </div>
                                 <div class="card-body">
                                     <div class="table-responsive">
+                                        {{#if count}}
                                         <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
                                             <thead>
                                                 <tr>
-                                                    <th>Customer Name</th>
-                                                    <th>Total</th>
-                                                    <th>Product</th>
+                                                    <th>Id</th>
+                                                    <th>Username</th>
+                                                    {{!-- <th>Password</th> --}}
+                                                    <th>Email</th>
+                                                    <th>Role</th>
                                                 </tr>
                                             </thead>
                                             <tbody>
-                                                {{#each orders}}
-                                                    <tr>
-                                                        <td>{{ username }}</td>
-                                                        <td>${{ total }}</td>
-                                                        <td>
-                                                            <!-- Thêm nút xem chi tiết -->
-                                                            <a href="/adminorder/{{ this._id }}">View Details</a>
-                                                        </td>
-                                                    </tr>
-                                                {{/each}}
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                </div>
-                            </div>
-
-
-                        </div>
-
-                    </div> --}}
-
-                    <div class="row">
-                        <div class="col-xl-8 col-lg-7">
-                            <div class="card shadow mb-4">
-                                <div class="card-header py-3">
-                                    <h6 class="m-0 font-weight-bold text-primary">Order Details</h6>
-                                </div>
-                                <div class="card-body">
-                                    <p><strong>Order ID:</strong> {{ order._id }}</p>
-                                    {{#each order.user}}
-                                        <p><strong>Username:</strong> {{ this.username }}</p>
-                                        <p><strong>Email:</strong> {{ this.email }}</p>
-                                    {{/each}}
-                                    <p><strong>Total:</strong> {{ order.total }}đ</p>
-                                    <p><strong>Products:</strong></p>
-                                    <div class="table-responsive">
-                                        <table class="table table-bordered" id="orderProductsTable" width="100%" cellspacing="0">
-                                            <thead>
+                                                {{#each users}}
                                                 <tr>
-                                                    <th>Title</th>
-                                                    <th>Quantity</th>
-                                                    <th>Price</th>
-                                                    <th>Image</th>
+                                                    <td>{{this._id}}</td>
+                                                    <td>{{this.username}}</td>
+                                                    {{!-- <td>{{this.password}}</td> --}}
+                                                    <td>{{this.email}}</td>                                                   
+                                                    <td>{{this.role}}</td>                                                  
+                                                    <td><a href="/adminusers/edit-user/{{this._id}}">Edit</a></td>
+                                                    <td><a class="btn" data-bs-toggle="modal" data-bs-id="{{this._id}}" href="" data-bs-target="#delete-user-modal">Delete</a></td>
                                                 </tr>
-                                            </thead>
-                                            <tbody>
-                                                {{#each order.products}}
-                                                    <tr>
-                                                        <td>{{ this.title }}</td>
-                                                        <td>{{ this.qty }}</td>
-                                                        <td>{{ this.price }}đ</td>
-                                                        <td>
-                                                            {{#if this.image}}
-                                                                <img src="{{ this.image }}" alt="{{ this.title }}" style="max-width: 100px;">
-                                                            {{else}}
-                                                                N/A
-                                                            {{/if}}
-                                                        </td>
-                                                    </tr>
                                                 {{/each}}
                                             </tbody>
                                         </table>
+                                        {{else}}
+                                        <h3 class="text-center">There are no users.</h3>
+                                        {{/if}}
                                     </div>
                                 </div>
                             </div>
                         </div>
+
                     </div>
+
                 </div>
                 <!-- /.container-fluid -->
 
@@ -477,6 +435,51 @@
             </div>
         </div>
     </div>
+
+    {{!-- Confirm delete modal--}}
+<!-- Confirm delete modal -->
+<div class="modal fade" id="delete-user-modal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h1 class="modal-title fs-5" id="exampleModalLabel">Confirm Delete ?</h1>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <p>Delete...</p>
+      </div>
+      <div class="modal-footer">
+        <button id="btn-delete-user" type="button" class="btn btn-danger">Delete</button>
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Hidden delete form -->
+<form name="delete-form" method="POST"></form>
+
+<script>
+    const deleteModal = document.getElementById('delete-user-modal')
+    var userId;
+    var deleteForm = document.forms['delete-form']; // lấy form ẩn xóa trong DOM
+    var btnDelete = document.getElementById('btn-delete-user'); // lấy nút xóa trong modal confirm xóa
+
+    if (deleteModal) {
+        deleteModal.addEventListener('show.bs.modal', event => { // lắng nghe event click vào nút xóa trong dang sách course
+            const button = event.relatedTarget;
+            userId = button.getAttribute('data-bs-id'); // lấy id của course muốn xóa khi click vào nút xóa của course đó
+            //console.log(courseId);
+        })
+    }
+
+    btnDelete.onclick = function() { // lắng nghe event click nút xóa
+        // tạo action mới cho deleteForm như sau: /courses/_id?_method=DELETE:
+        deleteForm.action = '/adminusers' + '/delete-user/' + userId + '?_method=DELETE'; // overdrive method POST của hidden form bằng method DELETE
+        deleteForm.submit(); // thực thi form ẩn để xóa course đang chọn
+    }
+</script>
+
 
     <!-- Bootstrap core JavaScript-->
     <script src="/vendor2/jquery/jquery.min.js"></script>

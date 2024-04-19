@@ -16,24 +16,6 @@ const checkAdminPage = require('../middleware/checkrole');
 // Get Page model
 var Page = require('../app/models/page');
 
-/*
- * GET pages index
- */
-
-// postman:
-router.get('/p-page', (req, res) => {
-    // Find all pages and sort them by sorting field
-    Page.find({}).sort({ sorting: 1 }).exec()
-        .then(pages => {
-            // If pages are found, send them as a JSON response
-            res.status(200).json(pages);
-        })
-        .catch(err => {
-            // If an error occurs, send a 500 Internal Server Error response
-            console.error(err);
-            res.status(500).json({ error: 'Internal Server Error' });
-        });
-});
 
 function authenticateToken(req, res, next) {
     const token = req.cookies.token;
@@ -53,6 +35,26 @@ function authenticateToken(req, res, next) {
     // Tiếp tục middleware dù có token hay không
     next();
 }
+
+/*
+ * GET pages index
+ */
+
+// postman:
+router.get('/p-page', (req, res) => {
+    // Find all pages and sort them by sorting field
+    Page.find({}).sort({ sorting: 1 }).exec()
+        .then(pages => {
+            // If pages are found, send them as a JSON response
+            res.status(200).json(pages);
+        })
+        .catch(err => {
+            // If an error occurs, send a 500 Internal Server Error response
+            console.error(err);
+            res.status(500).json({ error: 'Internal Server Error' });
+        });
+});
+
 
 // client:
 router.get('/', authenticateToken, checkLogin, checkAdminPage, (req, res) => {
@@ -76,6 +78,20 @@ router.get('/', authenticateToken, checkLogin, checkAdminPage, (req, res) => {
     });
 });
 
+// page id Postman
+router.get('/p-pageid/:pageId', async (req, res) => {
+    try {
+        const pageId = req.params.pageId;
+        const page = await Page.findById(pageId);
+        if (!page) {
+            return res.status(404).json({ error: 'Page not found' });
+        }
+        res.status(200).json(page);
+    } catch (error) {
+        console.error('Error fetching page:', error);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+});
 
 /*
  * GET add page

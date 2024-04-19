@@ -12,22 +12,6 @@ const checkAdminCategory = require('../middleware/checkrole');
 
 var Category = require('../app/models/category');
 
-/*
- * GET category index
- */
-
-// postman::
-router.get('/p-category', (req, res) => {
-    Category.find({}).exec()
-        .then(categories => {
-            res.status(200).json(categories);
-        })
-        .catch(err => {
-            // If an error occurs, send a 500 Internal Server Error response
-            console.error(err);
-            res.status(500).json({ error: 'Internal Server Error' });
-        });
-});
 
 function authenticateToken(req, res, next) {
     const token = req.cookies.token;
@@ -48,6 +32,23 @@ function authenticateToken(req, res, next) {
     next();
 }
 
+
+/*
+ * GET category index
+ */
+
+// postman::
+router.get('/p-category', (req, res) => {
+    Category.find({}).exec()
+        .then(categories => {
+            res.status(200).json(categories);
+        })
+        .catch(err => {
+            // If an error occurs, send a 500 Internal Server Error response
+            console.error(err);
+            res.status(500).json({ error: 'Internal Server Error' });
+        });
+});
 
 
 // client:
@@ -71,6 +72,22 @@ router.get('/', authenticateToken, checkLogin, checkAdminCategory, (req, res) =>
             res.status(500).send('Internal Server Error');
         });
 });
+
+// category id Postman
+router.get('/p-categoryid/:categoryId', async (req, res) => {
+    try {
+        const categoryId = req.params.categoryId;
+        const category = await Category.findById(categoryId);
+        if (!category) {
+            return res.status(404).json({ error: 'Category not found' });
+        }
+        res.status(200).json(category);
+    } catch (error) {
+        console.error('Error fetching category:', error);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+});
+
 
 /*
  * GET add category

@@ -51,17 +51,10 @@ router.get('/add/:product', checkLogin, async (req, res) => {
             return res.status(404).send("Product not found");
         }
 
-        // Lấy userId từ token trong cookie
-        // const token = req.cookies.token;
-        // const decoded = jwt.verify(token, 'pass');
-        // const userId = decoded._id;
-        // const username = decoded.username;
-
         // Lấy userId và username từ middleware checkLogin
         const userId = req.userId;
         const username = req.username;
         const email = req.email;
-
 
 
         if (typeof req.session.cart == "undefined") {
@@ -76,6 +69,7 @@ router.get('/add/:product', checkLogin, async (req, res) => {
                 username: username, // Lưu username vào thông tin giỏ hàng
                 email: email
             });
+            console.log('first session: ', req.session);
         } else {
             var cart = req.session.cart;
             var newItem = true;
@@ -99,10 +93,18 @@ router.get('/add/:product', checkLogin, async (req, res) => {
                     username: username, // Lưu username vào thông tin giỏ hàng
                     email: email
                 });
+                //console.log('session updated1: ', req.session);
+
             }
         }
-        req.flash('success', 'Product added!');
-        res.redirect('back');
+        // Trả về mã JavaScript để hiển thị cảnh báo
+        res.send(`
+            <script>
+                alert('Product added to cart!');
+                window.location.href = '/products';
+            </script>
+        `);
+        //res.redirect('back');
     } catch (err) {
         console.log(err);
         res.status(500).send("Server Error");
@@ -166,6 +168,7 @@ router.post('/update/:product', checkLogin, (req, res) => {
                     break;
             }
             //console.log(req.session.cart);
+            //console.log('session updated2: ', req.session);
             break;
         }
     }
@@ -180,9 +183,14 @@ router.post('/update/:product', checkLogin, (req, res) => {
 router.get('/clear', checkLogin, (req, res) => {
 
     delete req.session.cart;
+    //console.log('session after deleting: ', req.session);
     
-    req.flash('success', 'Cart cleared!');
-    res.redirect('/cart/checkout');
+    //res.redirect('/cart/checkout');
+    res.send(`
+        <script>
+            window.location.href = '/cart/checkout';
+        </script>
+    `);
 
 });
 
