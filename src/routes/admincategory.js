@@ -7,7 +7,8 @@ const jwt = require('jsonwebtoken');
 
 // Import middleware checkLogin
 const checkLogin = require('../middleware/checklogin');
-const checkAdminCategory = require('../middleware/checkrole');
+// const checkAdminCategory = require('../middleware/checkrole');
+const checkAdmin = require('../middleware/checkrole');
 
 
 var Category = require('../app/models/category');
@@ -52,7 +53,7 @@ router.get('/p-category', (req, res) => {
 
 
 // client:
-router.get('/', authenticateToken, checkLogin, checkAdminCategory, (req, res) => { // Áp dụng middleware checkLogin và checkAdminCategory
+router.get('/', authenticateToken, checkLogin, checkAdmin, (req, res) => { 
     // Find all categories
     Category.find()
         .then(categories => {
@@ -92,7 +93,7 @@ router.get('/p-categoryid/:categoryId', async (req, res) => {
 /*
  * GET add category
  */
-router.get('/add-category', authenticateToken, checkLogin, checkAdminCategory, (req, res, next) => {
+router.get('/add-category', authenticateToken, checkLogin, checkAdmin, (req, res, next) => {
 
     var title = "";
 
@@ -148,7 +149,7 @@ router.post('/p-addcategory', [
 // client:
 router.post('/add-category', [
     body('title').notEmpty().withMessage('Title must have a value.'),
-], checkLogin, checkAdminCategory, (req, res) => {
+], checkLogin, checkAdmin, (req, res) => {
 
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -184,7 +185,7 @@ router.post('/add-category', [
 /*
  * GET edit category
  */
-router.get('/edit-category/:id', authenticateToken, checkLogin, checkAdminCategory, (req, res) => {
+router.get('/edit-category/:id', authenticateToken, checkLogin, checkAdmin, (req, res) => {
 
     Category.findById(req.params.id)
         .then(category => {
@@ -251,7 +252,7 @@ router.put('/p-editcategory/:id', [
 // client:
 router.put('/edit-category/:id', [
     body('title').notEmpty().withMessage('Title must have a value.')
-], checkLogin, checkAdminCategory, (req, res) => {
+], checkLogin, checkAdmin, (req, res) => {
 
     const id = req.params.id;
     const title = req.body.title;
@@ -312,7 +313,7 @@ router.delete('/p-deletecategory/:id', (req, res) => {
 });
 
 // client:
-router.delete('/delete-category/:id', checkLogin, checkAdminCategory, (req, res) => {
+router.delete('/delete-category/:id', checkLogin, checkAdmin, (req, res) => {
     Category.findOneAndDelete({ _id: req.params.id })
         .then(deletedCategory => {
             if (!deletedCategory) {

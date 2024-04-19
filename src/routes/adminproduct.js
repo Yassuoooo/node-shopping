@@ -10,7 +10,7 @@ const jwt = require('jsonwebtoken');
 
 
 const checkLogin = require('../middleware/checklogin');
-const checkAdminProduct = require('../middleware/checkrole');
+const checkAdmin = require('../middleware/checkrole');
 
 var Product = require('../app/models/product');
 var Category = require('../app/models/category');
@@ -55,7 +55,7 @@ router.get('/p-product', (req, res) => {
 });
 
 // client:
-router.get('/', authenticateToken, checkLogin, checkAdminProduct, (req, res) => {
+router.get('/', authenticateToken, checkLogin, checkAdmin, (req, res) => {
     let count;
 
     Product.countDocuments()
@@ -98,7 +98,7 @@ router.get('/p-productid/:productId', async (req, res) => {
 /*
  * GET add product
  */
-router.get('/add-product', authenticateToken, checkLogin, checkAdminProduct, (req, res) => {
+router.get('/add-product', authenticateToken, checkLogin, checkAdmin, (req, res) => {
     const title = "";
     const desc = "";
     const price = "";
@@ -179,7 +179,7 @@ router.post('/add-product', [
         }
         return true;
     })
-], checkLogin, checkAdminProduct, (req, res) => {
+], checkLogin, checkAdmin, (req, res) => {
 
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -256,7 +256,7 @@ router.post('/add-product', [
  * GET edit product
  */
 
-router.get('/edit-product/:id', authenticateToken, checkLogin, checkAdminProduct, (req, res) => {
+router.get('/edit-product/:id', authenticateToken, checkLogin, checkAdmin, (req, res) => {
     Product.findById(req.params.id)
         .then(product => {
             if (!product) {
@@ -337,7 +337,7 @@ router.put('/p-editproduct/:id', (req, res) => {
 
 
 // client:
-router.put('/edit-product/:id', checkLogin, checkAdminProduct, (req, res) => {
+router.put('/edit-product/:id', checkLogin, checkAdmin, (req, res) => {
     const id = req.params.id;
     const title = req.body.title;
     const slug = title.replace(/\s+/g, '-').toLowerCase();
@@ -438,7 +438,7 @@ router.delete('/p-deleteproduct/:id', (req, res) => {
 
 
 // client:
-router.delete('/delete-product/:id', checkLogin, checkAdminProduct, (req, res) => {
+router.delete('/delete-product/:id', checkLogin, checkAdmin, (req, res) => {
     const id = req.params.id;
 
     Product.findById(id)

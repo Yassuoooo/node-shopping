@@ -10,7 +10,7 @@ var Order = require('../app/models/cart');
 
 // Import middleware checkLogin
 const checkLogin = require('../middleware/checklogin');
-const checkAdminOrderProduct = require('../middleware/checkrole');
+const checkAdmin = require('../middleware/checkrole');
 
 
 function authenticateToken(req, res, next) {
@@ -49,7 +49,7 @@ router.get('/p-order', async (req, res) => {
 
 
 // client:
-router.get('/', authenticateToken, checkLogin, checkAdminOrderProduct, async (req, res) => {
+router.get('/', authenticateToken, checkLogin, checkAdmin, async (req, res) => {
     try {
         const orders = await Order.find().populate('user.userId');
         const ordersObject = orders.map(order => ({
@@ -88,7 +88,7 @@ router.get('/p-orders/:orderId', async (req, res) => {
 
 
 // client:
-router.get('/:orderId', authenticateToken, checkLogin, checkAdminOrderProduct, async (req, res) => {
+router.get('/:orderId', authenticateToken, checkLogin, checkAdmin, async (req, res) => {
     try {
         const orderId = req.params.orderId;
         const order = await Order.findById(orderId).populate('user.userId');

@@ -4,9 +4,7 @@ const jwt = require('jsonwebtoken');
 const adminController = require('../app/controllers/AdminController'); 
 
 const checkLogin = require('../middleware/checklogin');
-const checkAdminHome = require('../middleware/checkrole');
-
-// router.get('/', checkLogin, checkAdminHome, adminController.index);
+const checkAdmin = require('../middleware/checkrole');
 
 function authenticateToken(req, res, next) {
     const token = req.cookies.token;
@@ -27,7 +25,7 @@ function authenticateToken(req, res, next) {
     next();
 }
 
-router.get('/', authenticateToken, checkLogin, checkAdminHome, (req, res) => {  
+router.get('/', authenticateToken, checkLogin, checkAdmin, (req, res) => {  
     res.render('admin/adminhome2', {
         isLoggedIn: req.isLoggedIn,
         layout: 'adminmain'

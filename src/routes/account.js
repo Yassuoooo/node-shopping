@@ -64,7 +64,7 @@ router.get('/register', (req, res) => {
 })
 
 // postman:
-router.post('/register', (req, res) => {
+router.post('/p-register', (req, res) => {
     const { username, password, email } = req.body;
 
     // Kiểm tra xem tài khoản đã tồn tại chưa

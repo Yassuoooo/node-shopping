@@ -6,7 +6,7 @@ const jwt = require('jsonwebtoken');
 
 // Import middleware checkLogin và checkAdminRole
 const checkLogin = require('../middleware/checklogin');
-const checkAdminUsers = require('../middleware/checkrole');
+const checkAdmin = require('../middleware/checkrole');
 
 // Import model của người dùng
 const AccountModel = require('../app/models/account');
@@ -52,7 +52,7 @@ router.get('/p-users', (req, res) => {
 
 
 // client:
-router.get('/', authenticateToken, checkLogin, checkAdminUsers, (req, res) => {
+router.get('/', authenticateToken, checkLogin, checkAdmin, (req, res) => {
     let count;
 
     AccountModel.countDocuments()
@@ -95,7 +95,7 @@ router.get('/p-userid/:userId', async (req, res) => {
 /*
  * GET edit users
  */
-router.get('/edit-user/:id', authenticateToken, checkLogin, checkAdminUsers, (req, res) => {
+router.get('/edit-user/:id', authenticateToken, checkLogin, checkAdmin, (req, res) => {
 
     AccountModel.findById(req.params.id)
         .then(user => {
@@ -171,7 +171,7 @@ router.put('/edit-user/:id', [
     body('username').notEmpty().withMessage('Username must have a value.'),
     body('email').notEmpty().withMessage('Email must have a value.'),
     body('role').notEmpty().withMessage('Role must have a value.')
-], checkLogin, checkAdminUsers, (req, res) => {
+], checkLogin, checkAdmin, (req, res) => {
 
     const id = req.params.id;
     const username = req.body.username;
@@ -236,7 +236,7 @@ router.delete('/p-deleteuser/:id', (req, res) => {
 });
 
 // client:
-router.delete('/delete-user/:id', checkLogin, checkAdminUsers, (req, res) => {
+router.delete('/delete-user/:id', checkLogin, checkAdmin, (req, res) => {
     AccountModel.findOneAndDelete({ _id: req.params.id })
         .then(deletedUser => {
             if (!deletedUser) {
