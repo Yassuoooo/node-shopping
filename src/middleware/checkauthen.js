@@ -1,12 +1,8 @@
 const express = require('express');
-const router = express.Router();
+const router = express.Router(); 
 const jwt = require('jsonwebtoken');
-const adminController = require('../app/controllers/AdminController'); 
 
-const checkLogin = require('../middleware/checklogin');
-const checkAdmin = require('../middleware/checkrole');
-
-function authenticateToken(req, res, next) {
+var authenticateToken = (req, res, next) =>{
     const token = req.cookies.token;
 
     if (token) {
@@ -25,19 +21,5 @@ function authenticateToken(req, res, next) {
     next();
 }
 
-router.get('/', authenticateToken, checkLogin, checkAdmin, (req, res) => {  
-    res.render('admin/adminhome2', {
-        isLoggedIn: req.isLoggedIn,
-        layout: 'adminmain'
-    });
-});
 
-
-module.exports = router; // export router ra ngoài để route parent là index.js có thể sử dụng
-
-
-
-
-
-
-
+module.exports = authenticateToken;

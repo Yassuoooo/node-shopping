@@ -31,7 +31,7 @@
         <ul class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion" id="accordionSidebar">
 
             <!-- Sidebar - Brand -->
-            <a class="sidebar-brand d-flex align-items-center justify-content-center" href="/admin">
+            <a class="sidebar-brand d-flex align-items-center justify-content-center" href="/admin/home">
                 <div class="sidebar-brand-icon rotate-n-15">
                     <i class="fas fa-laugh-wink"></i>
                 </div>
@@ -43,7 +43,7 @@
 
             <!-- Nav Item - Dashboard -->
             <li class="nav-item">
-                <a class="nav-link" href="/admin">
+                <a class="nav-link" href="/admin/home">
                     <i class="fas fa-fw fa-tachometer-alt"></i>
                     <span>Dashboard</span></a>
             </li>
@@ -353,7 +353,7 @@
 
                             <div class="card shadow mb-4">
                                 <div class="card-header py-3">
-                                    <a href="/adminproduct/add-product" class="btn btn-primary">Add a new product</a>
+                                    <a href="/admin/add-product" class="btn btn-primary">Add a new product</a>
                                 </div>
                                 <div class="card-body">
                                     <div class="table-responsive">
@@ -383,7 +383,7 @@
                                                         {{/if}}
 
                                                     </td>
-                                                    <td><a href="/adminproduct/edit-product/{{this._id}}">Edit</a></td>
+                                                    <td><a href="/admin/edit-product/{{this._id}}">Edit</a></td>
                                                     <td><a class="btn" data-bs-toggle="modal" data-bs-id="{{this._id}}" href="" data-bs-target="#delete-product-modal">Delete</a></td>
                                                 </tr>
                                                 {{/each}}
@@ -485,7 +485,7 @@
 
     btnDelete.onclick = function() { // lắng nghe event click nút xóa
         // tạo action mới cho deleteForm như sau: /courses/_id?_method=DELETE:
-        deleteForm.action = '/adminproduct' + '/delete-product/' + productId + '?_method=DELETE'; // overdrive method POST của hidden form bằng method DELETE
+        deleteForm.action = '/admin' + '/delete-product/' + productId + '?_method=DELETE'; // overdrive method POST của hidden form bằng method DELETE
         deleteForm.submit(); // thực thi form ẩn để xóa course đang chọn
     }
 </script>

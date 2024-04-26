@@ -353,7 +353,7 @@
 
                             <div class="card shadow mb-4">
                                 <div class="card-header py-3">
-                                    <a href="/admincategory/add-category" class="btn btn-primary">Add a Category</a>
+                                    <a href="/admin/add-category" class="btn btn-primary">Add a Category</a>
                                 </div>
                                 <div class="card-body">
                                     <div class="table-responsive">
@@ -369,7 +369,7 @@
                                                 {{#each categories}}
                                                     <tr>
                                                         <td>{{title}}</td>
-                                                        <td><a href="/admincategory/edit-category/{{this._id}}">Edit</a></td>
+                                                        <td><a href="/admin/edit-category/{{this._id}}">Edit</a></td>
                                                         <td><a class="btn" data-bs-toggle="modal" data-bs-id="{{this._id}}" href="" data-bs-target="#delete-category-modal">Delete</a></td>
                                                     </tr>
                                                 {{/each}}
@@ -467,7 +467,7 @@
 
     btnDelete.onclick = function() { // lắng nghe event click nút xóa
         // tạo action mới cho deleteForm như sau: /courses/_id?_method=DELETE:
-        deleteForm.action = '/admincategory' + '/delete-category/' + categoryId + '?_method=DELETE'; // overdrive method POST của hidden form bằng method DELETE
+        deleteForm.action = '/admin' + '/delete-category/' + categoryId + '?_method=DELETE'; // overdrive method POST của hidden form bằng method DELETE
         deleteForm.submit(); // thực thi form ẩn để xóa course đang chọn
     }
 </script>

@@ -217,13 +217,13 @@
 							<div class="product-image-wrapper">
 								<div class="single-products">
 									<div class="productinfo text-center">
-                                        <h2 class="title text-center" href="/products/{{this.slug}}">{{ this.title }}</h2>
-                                        <a class="pa" href="/products/{{this.slug}}">
+                                        <h2 class="title text-center" href="/product/{{this.slug}}">{{ this.title }}</h2>
+                                        <a class="pa" href="/product/{{this.slug}}">
 										    <img class="img-pd" src="/product_images/{{ this._id }}/{{ this.image }}" alt="{{ this.title }}" />
                                         </a>
 										<h2>{{ formatCurrency this.price }}đ</h2>
 										<p>{{ this.desc }}</p>
-										<form action="/cart/add/{{ this.slug }}" method="get">
+										<form action="/add/{{ this.slug }}" method="get">
 											<button class="btn btn-default add-to-cart" type="submit"><i class="fa fa-shopping-cart"></i>Add to cart</button>
 										</form>
 									</div>

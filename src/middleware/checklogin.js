@@ -1,10 +1,5 @@
-const express = require('express');
-const router = express.Router(); 
+
 const jwt = require('jsonwebtoken');
-const cookieParser = require('cookie-parser');
-
-
-var AccountModel = require('../app/models/account');
 
 
 var checkLogin = (req, res, next) => {
@@ -13,7 +8,7 @@ var checkLogin = (req, res, next) => {
         if (!token) {
             //return res.json('unallowed');
             //res.locals.loggedIn = false; // Người dùng chưa đăng nhập
-            return res.redirect('/account/login_required');
+            return res.redirect('/login_required');
         }
 
         jwt.verify(token, 'pass', (err, decoded) => {

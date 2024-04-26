@@ -353,7 +353,7 @@
 
                             <div class="card shadow mb-4">
                                 <div class="card-header py-3">
-                                    <a href="/adminpage/add-page" class="btn btn-primary">Add a new page</a>
+                                    <a href="/admin/add-page" class="btn btn-primary">Add a new page</a>
                                 </div>
                                 <div class="card-body">
                                     <div class="table-responsive">
@@ -369,7 +369,7 @@
                                                 {{#each pages}}
                                                     <tr>
                                                         <td>{{this.title}}</td>
-                                                        <td><a href="/adminpage/edit-page/{{this._id}}">Edit</a></td>
+                                                        <td><a href="/admin/edit-page/{{this._id}}">Edit</a></td>
                                                         {{#eq this.slug "home"}}
                                                         <td></td>
                                                         {{else}}
@@ -472,7 +472,7 @@
 
     btnDelete.onclick = function() { // lắng nghe event click nút xóa
         // tạo action mới cho deleteForm như sau: /courses/_id?_method=DELETE:
-        deleteForm.action = '/adminpage' + '/delete-page/' + pageId + '?_method=DELETE'; // overdrive method POST của hidden form bằng method DELETE
+        deleteForm.action = '/admin' + '/delete-page/' + pageId + '?_method=DELETE'; // overdrive method POST của hidden form bằng method DELETE
         deleteForm.submit(); // thực thi form ẩn để xóa course đang chọn
     }
 </script>

@@ -31,7 +31,7 @@
         <ul class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion" id="accordionSidebar">
 
             <!-- Sidebar - Brand -->
-            <a class="sidebar-brand d-flex align-items-center justify-content-center" href="/admin">
+            <a class="sidebar-brand d-flex align-items-center justify-content-center" href="/admin/home">
                 <div class="sidebar-brand-icon rotate-n-15">
                     <i class="fas fa-laugh-wink"></i>
                 </div>
@@ -43,7 +43,7 @@
 
             <!-- Nav Item - Dashboard -->
             <li class="nav-item">
-                <a class="nav-link" href="/admin">
+                <a class="nav-link" href="/admin/home">
                     <i class="fas fa-fw fa-tachometer-alt"></i>
                     <span>Dashboard</span></a>
             </li>
@@ -351,10 +351,10 @@
 
                             <!-- Order List -->
                             <h2 class="page-title">Edit a page</h2>
-                            <a href="/adminpage" class="btn btn-primary">Back to all pages</a>
+                            <a href="/admin/pages" class="btn btn-primary">Back to all pages</a>
                             <br><br>
 
-                            <form method="POST" action="/adminpage/edit-page/{{id}}?_method=PUT">
+                            <form method="POST" action="/admin/edit-page/{{id}}?_method=PUT">
 
                                 <div class="form-group">
                                     <label for="">Title</label>

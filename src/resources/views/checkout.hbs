@@ -84,7 +84,7 @@
 	</section> <!--/#cart_items-->
 	<!-- Nút Buy Now -->
     <div class="text-center">
-        <button class="btn btn-primary buynow" href="/cart/buynow">Buy Now</button>
+        <button class="btn btn-primary buynow" href="/buynow">Buy Now</button>
     </div>
 
     <!-- Nút Clear Cart -->
@@ -154,7 +154,7 @@ document.addEventListener('DOMContentLoaded', function () {
             const dataAction = this.getAttribute('data-action');
             const dataTitle = this.getAttribute('data-title');
 
-            fetch(`/cart/update/${dataTitle}?action=${dataAction}`, {
+            fetch(`/update/${dataTitle}?action=${dataAction}`, {
                 method: 'POST' // Sử dụng phương thức POST
             })
             .then(response => {
@@ -182,7 +182,7 @@ document.addEventListener('DOMContentLoaded', function () {
             event.preventDefault();
 
             // Gọi API để lưu đơn hàng vào MongoDB
-            fetch('/cart/checkout2', {
+            fetch('/checkout2', {
                 method: 'POST'
             })
             .then(response => {
@@ -195,7 +195,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 // Xử lý sau khi đơn hàng được lưu thành công
                 //alert('Order placed successfully!');
                 // Chuyển hướng sang trang order-success.hbs sau khi đặt hàng thành công
-                window.location.href = '/cart/order_success';
+                window.location.href = '/order_success';
             })
             .catch(error => {
                 console.error('There was a problem with your fetch operation:', error);
@@ -210,7 +210,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
 <script>
     function clearCart() {
-        fetch('/cart/clear', {
+        fetch('/clear', {
             method: 'GET',
             credentials: 'same-origin' // Đảm bảo cookie được gửi đi trong yêu cầu
         })

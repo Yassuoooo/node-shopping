@@ -38,6 +38,34 @@ function authenticateToken(req, res, next) {
  * GET category index
  */
 
+// router.get('/', authenticateToken, checkLogin, checkAdmin, async (req, res) => {
+//     try {
+//         // Kiểm tra nếu yêu cầu đến từ Postman
+//         if (req.headers['user-agent'] && req.headers['user-agent'].includes('Postman')) {
+//             // Nếu từ Postman, trả về JSON category từ cơ sở dữ liệu
+//             const categories = await Category.find();
+//             return res.status(200).json(categories);
+//         } else {
+//             // Nếu không phải từ Postman, trả về trang danh sách category
+//             const categories = await Category.find();
+//             const categoriesObject = categories.map(category => mongooseToObject(category));
+            
+//             // Render the handlebars template with the converted categories
+//             res.render('admin/categories2', {
+//                 categories: categoriesObject,
+//                 isLoggedIn: req.isLoggedIn,
+//                 layout: 'adminmain'
+//             });
+//         }
+//     } catch (error) {
+//         console.error(error);
+//         // Trả về lỗi nếu có lỗi xảy ra
+//         return res.status(500).json({ error: 'Internal Server Error' });
+//     }
+// });
+
+
+
 // postman::
 router.get('/p-category', (req, res) => {
     Category.find({}).exec()

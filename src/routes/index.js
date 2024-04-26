@@ -1,45 +1,20 @@
 
 // Import các route children:
+const adminRouter = require('./admin'); 
 const homeRouter = require('./home'); 
-const adminHomeRouter = require('./adminhome');
-const pageAdminRouter = require('./adminpage');
-const categoryAdminRouter = require('./admincategory');
-const productAdminRouter = require('./adminproduct');
-const orderAdminRouter = require('./adminorder');
-const orderAdminUsers = require('./adminusers');
-const pagesRouter = require('./pages');
-const productRouter = require('./product');
-const cartRouter = require('./cart');
-const accountRouter = require('./account');
-
 
 
 // Route parent chung:
 function route(app) {
-    // tạo hàm route và truyền vào instance app của express
 
-    app.use('/admin', adminHomeRouter);
 
-    app.use('/adminpage', pageAdminRouter);
-
-    app.use('/admincategory', categoryAdminRouter);
-
-    app.use('/adminproduct', productAdminRouter);
-
-    app.use('/adminorder', orderAdminRouter);
-
-    app.use('/adminusers', orderAdminUsers);
+    // admin mvc:
+    app.use('/admin', adminRouter);
     
-    app.use('/products', productRouter);
 
-    app.use('/cart', cartRouter);
+    // user mvc:
+    app.use('/', homeRouter);
 
-    app.use('/account', accountRouter);
-
-
-    //app.use('/home', homeRouter); // truyền vào path và function handler
-
-    app.use('/', pagesRouter);
     
 }
 
